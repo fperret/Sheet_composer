@@ -15,7 +15,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public Q_SLOTS:
+    void addNewNote();
+    bool saveSheet() const;
+    void openSheet();
+
 private:
     Ui::MainWindow *ui;
+    std::string m_currentSheetPath;
+
+    void createToolBar();
 };
 #endif // MAINWINDOW_H
