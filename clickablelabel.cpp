@@ -4,7 +4,7 @@
 {
 
 }*/
-ClickableLabel::ClickableLabel() : QLabel()
+ClickableLabel::ClickableLabel(QWidget *p_parent) : QLabel(p_parent)
 {
 
 }

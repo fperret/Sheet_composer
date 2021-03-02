@@ -11,7 +11,7 @@ class ClickableLabel : public QLabel
     Q_OBJECT
 
 public:
-    ClickableLabel();
+    ClickableLabel(QWidget *p_parent);
     ~ClickableLabel();
 
 signals:

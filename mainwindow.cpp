@@ -80,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *l_openAction = new QAction(tr("&Open"), this);
     l_saveAction->connect(l_openAction, &QAction::triggered, this, &MainWindow::openSheet);
     menuBar()->addAction(l_openAction);
+
 }
 
 MainWindow::~MainWindow()

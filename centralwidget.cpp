@@ -60,19 +60,44 @@ const std::string getNoteImagePath(const NoteVal &p_note)
     }
 }
 
+void CentralWidget::addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget)
+{
+    p_layout->addWidget(p_widget, m_currentLastRow, m_currentLastColumn);
+
+    // This needs to stay before addWidget because we use these values to set the "Add" image
+    if (m_currentLastColumn == m_maxColumns - 1) {
+        m_currentLastColumn = 0;
+        m_currentLastRow += 1;
+    } else {
+        m_currentLastColumn += 1;
+    }
+}
+
+void CentralWidget::placeAddImage()
+{
+    m_baseLayout->addWidget(m_imageAdd, m_currentLastRow, m_currentLastColumn);
+}
+
 void CentralWidget::addImage(QGridLayout *p_layout, const NoteVal &p_note)
 {
     const std::string l_imagePath = getNoteImagePath(p_note);
     QPixmap l_image(l_imagePath.c_str());
     //QLabel *l_imageLabel = new QLabel();
 
-    ClickableLabel *l_imageLabel = new ClickableLabel();
+    ClickableLabel *l_imageLabel = new ClickableLabel(this);
     l_imageLabel->setPixmap(l_image);
+    l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
 //qDebug() << p_layout->rowCount() << " / " << p_layout->columnCount();
-    p_layout->addWidget(l_imageLabel, p_layout->rowCount() - 1, p_layout->columnCount());
 
+    addWidgetInLastPos(p_layout, l_imageLabel);
+    //p_layout->addWidget(l_imageLabel, m_currentLastRow, m_currentLastColumn - 1);
     connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
     //p_layout->setColumnStretch(p_layout->columnCount() - 1, 2);
+}
+
+void CentralWidget::addNote()
+{
+
 }
 
 void CentralWidget::imageClicked()
@@ -136,6 +161,12 @@ void CentralWidget::unserializeSheet(QJsonObject &p_jsonIn)
     logCurrentNotes();
 }
 
+void CentralWidget::addNotePopup()
+{
+    addImage(m_baseLayout, NoteVal::DO);
+    placeAddImage();
+}
+
 void CentralWidget::deleteCurrentNotes()
 {
     for (auto l_elem : m_notes) {
@@ -148,6 +179,27 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent)
 {
     m_baseLayout = new QGridLayout(this);
     m_imageSelected = nullptr;
+
+    m_maxColumns = 5;
+    m_maxRows = 5;
+    m_currentLastColumn = 0;
+    m_currentLastRow = 0;
+
+    m_baseLayout->setSpacing(1);
+    for (int i = 0; i < m_maxColumns; ++i) {
+        m_baseLayout->setColumnStretch(i, 1);
+    }
+    for (int i = 0; i < m_maxRows; ++i) {
+        m_baseLayout->setRowStretch(i, 1);
+    }
+
+    // Button ADD
+    QPixmap l_addImage(":/images/plus_sign.png");
+    m_imageAdd = new ClickableLabel(this);
+    m_imageAdd->setPixmap(l_addImage);
+    m_imageAdd->setStyleSheet("QLabel { background-color : red; }");
+    placeAddImage();
+    connect(m_imageAdd, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
 }
 
 CentralWidget::~CentralWidget()
