@@ -19,10 +19,13 @@ public Q_SLOTS:
     void addNewNote();
     bool saveSheet() const;
     void openSheet();
+    void createNoteWidget();
 
 private:
     Ui::MainWindow *ui;
     std::string m_currentSheetPath;
+
+    QString m_selectedFileName;
 
     void createToolBar();
 };
