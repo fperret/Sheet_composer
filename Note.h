@@ -11,6 +11,7 @@ enum NoteVal
     FA,
     SO,
     LA,
+    SI,
     UNSET,
 };
 Q_DECLARE_METATYPE(NoteVal)
