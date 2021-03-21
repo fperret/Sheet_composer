@@ -57,10 +57,15 @@ void MainWindow::openSheet()
     ((CentralWidget *)centralWidget())->createSheetDisplay();
 }
 
+#include <QLayout>
+
+/*
+ * Create a dialog to select an image so that it becomes available as a note to add.
+ */
 void MainWindow::createNoteWidget()
 {
     QDialog l_dialog;
-    l_dialog.resize(300, 50);
+    l_dialog.resize(300, 100);
 
     QPushButton l_chooseImageButton(&l_dialog);
     l_chooseImageButton.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -68,20 +73,28 @@ void MainWindow::createNoteWidget()
     l_chooseImageButton.move(10, 10);
     l_chooseImageButton.setMinimumWidth(280);
 
-    // Add condition if empty string on callback
-    l_chooseImageButton.connect(&l_chooseImageButton, &QPushButton::clicked, this, [this]() {
-        m_selectedFileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "D:/Images/", tr("Image Files (*.png *jpg *.bmp)"));
-        qobject_cast<QPushButton *>(sender())->setText(m_selectedFileName.splitRef("/").last().toString());
-        qobject_cast<QPushButton *>(sender())->adjustSize();
+    QString l_filePath;
+    l_chooseImageButton.connect(&l_chooseImageButton, &QPushButton::clicked, this, [this, &l_filePath]() {
+        QString l_selectFile = QFileDialog::getOpenFileName(this, tr("Open Image"), "D:/Images/", tr("Image Files (*.png *jpg *.bmp)"));
+        if (l_selectFile.size() != 0) {
+            l_filePath = l_selectFile;
+            qobject_cast<QPushButton *>(sender())->setText(l_filePath.splitRef("/").last().toString());
+            qobject_cast<QPushButton *>(sender())->adjustSize();
+        }
     });
     l_chooseImageButton.setText("Select an image for the note");
 
-    // need to add OK / Cancel button
-    // When we click the red cross it goes in the else
+    QDialogButtonBox l_buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &l_dialog);
+    connect(&l_buttonBox, &QDialogButtonBox::accepted, &l_dialog, &QDialog::accept);
+    connect(&l_buttonBox, &QDialogButtonBox::rejected, &l_dialog, &QDialog::reject);
+
+    QVBoxLayout *verticalLayout = new QVBoxLayout();
+    l_dialog.setLayout(verticalLayout);
+    verticalLayout->addWidget(&l_buttonBox);
+    verticalLayout->setAlignment(&l_buttonBox, Qt::AlignRight | Qt::AlignBottom);
+
     if (l_dialog.exec()) {
-        qDebug() << "In dialog exec true";
-    } else {
-        qDebug() << "In else";
+        m_notesPaths.push_back(l_filePath);
     }
 }
 

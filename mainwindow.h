@@ -25,7 +25,7 @@ private:
     Ui::MainWindow *ui;
     std::string m_currentSheetPath;
 
-    QString m_selectedFileName;
+    QVector<QString> m_notesPaths;
 
     void createToolBar();
 };
