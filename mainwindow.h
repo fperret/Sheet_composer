@@ -25,8 +25,11 @@ private:
     Ui::MainWindow *ui;
     std::string m_currentSheetPath;
 
+    QVector<QString> m_instruments;
     QVector<QString> m_notesPaths;
 
     void createToolBar();
+    void saveCurrentInstrument(void) const;
+    void loadInstrument(const std::string &p_instrumentPath);
 };
 #endif // MAINWINDOW_H

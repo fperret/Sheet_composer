@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include <QPushButton>
 #include <QSize>
+#include <QLayout>
 
 #include "Utility.h"
 
@@ -57,8 +58,6 @@ void MainWindow::openSheet()
     ((CentralWidget *)centralWidget())->createSheetDisplay();
 }
 
-#include <QLayout>
-
 /*
  * Create a dialog to select an image so that it becomes available as a note to add.
  */
@@ -95,6 +94,7 @@ void MainWindow::createNoteWidget()
 
     if (l_dialog.exec()) {
         m_notesPaths.push_back(l_filePath);
+        saveCurrentInstrument();
     }
 }
 
@@ -109,7 +109,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // & in front of the string creates a keyboard shortcut linked to the first letter
     // menuBar is the menu at the very top of the window
-    QMenu *fileMenu = menuBar()->addMenu("&Filefe");
+    QMenu *fileMenu = menuBar()->addMenu("&File");
 
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
     QAction *newAction = new QAction(newIcon, tr("&New"), this);
@@ -128,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
     l_createNoteAction->connect(l_createNoteAction, &QAction::triggered, this, &MainWindow::createNoteWidget);
     menuBar()->addAction(l_createNoteAction);
 
+    loadInstrument("../instruments.json");
 }
 
 MainWindow::~MainWindow()
@@ -135,3 +136,25 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::saveCurrentInstrument(void) const
+{
+    QJsonObject l_root;
+    QJsonArray l_jsonPaths;
+    for (auto l_notePath : m_notesPaths) {
+        l_jsonPaths.push_back(l_notePath);
+    }
+    l_root["instrument"] = l_jsonPaths;
+    if (!saveJsonObject(l_root, "../instruments.json"))
+        return ;
+}
+
+void MainWindow::loadInstrument(const std::string &p_instrumentPath)
+{
+    QJsonObject l_root;
+    if (!loadJsonObjectFromFile(l_root, p_instrumentPath))
+        return ;
+    QJsonArray l_array = l_root["instrument"].toArray();
+    for (auto l_elem : l_array) {
+        m_notesPaths.push_back(l_elem.toString());
+    }
+}
