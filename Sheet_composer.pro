@@ -19,15 +19,20 @@ SOURCES += \
     Note.cpp \
     centralwidget.cpp \
     clickablelabel.cpp \
+    config.cpp \
     jsonUtility.cpp \
+    lineedit.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    sheetNewNote.cpp
 
 HEADERS += \
     Note.h \
     Utility.h \
     centralwidget.h \
     clickablelabel.h \
+    config.h \
+    lineedit.h \
     mainwindow.h
 
 FORMS += \

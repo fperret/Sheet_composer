@@ -7,7 +7,7 @@
 #include <QLayout>
 
 #include "Utility.h"
-
+#include "lineedit.h"
 #include "centralwidget.h"
 
 void MainWindow::addNewNote()
@@ -64,14 +64,18 @@ void MainWindow::openSheet()
 void MainWindow::createNoteWidget()
 {
     QDialog l_dialog;
-    l_dialog.resize(300, 100);
+    QVBoxLayout *l_verticalLayout = new QVBoxLayout();
 
-    QPushButton l_chooseImageButton(&l_dialog);
+    l_dialog.resize(300, 100);
+    l_dialog.setLayout(l_verticalLayout);
+
+    QPushButton l_chooseImageButton;
+    l_verticalLayout->addWidget(&l_chooseImageButton);
     l_chooseImageButton.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     l_chooseImageButton.ensurePolished();
     l_chooseImageButton.move(10, 10);
     l_chooseImageButton.setMinimumWidth(280);
-
+    l_chooseImageButton.setText("Select an image for the note");
     QString l_filePath;
     l_chooseImageButton.connect(&l_chooseImageButton, &QPushButton::clicked, this, [this, &l_filePath]() {
         QString l_selectFile = QFileDialog::getOpenFileName(this, tr("Open Image"), "D:/Images/", tr("Image Files (*.png *jpg *.bmp)"));
@@ -81,19 +85,26 @@ void MainWindow::createNoteWidget()
             qobject_cast<QPushButton *>(sender())->adjustSize();
         }
     });
-    l_chooseImageButton.setText("Select an image for the note");
+
+    // Note : value of note could be a string
+    LineEdit l_lineEdit;
+    l_verticalLayout->addWidget(&l_lineEdit);
+    l_lineEdit.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    l_lineEdit.ensurePolished();
+    l_lineEdit.setInputMask("dd");
+    l_lineEdit.setPlaceholderText("(Optional) Note value (1..99)");
 
     QDialogButtonBox l_buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &l_dialog);
+    l_verticalLayout->addWidget(&l_buttonBox);
+    l_verticalLayout->setAlignment(&l_buttonBox, Qt::AlignRight | Qt::AlignBottom);
     connect(&l_buttonBox, &QDialogButtonBox::accepted, &l_dialog, &QDialog::accept);
     connect(&l_buttonBox, &QDialogButtonBox::rejected, &l_dialog, &QDialog::reject);
 
-    QVBoxLayout *verticalLayout = new QVBoxLayout();
-    l_dialog.setLayout(verticalLayout);
-    verticalLayout->addWidget(&l_buttonBox);
-    verticalLayout->setAlignment(&l_buttonBox, Qt::AlignRight | Qt::AlignBottom);
-
     if (l_dialog.exec()) {
-        m_notesPaths.push_back(l_filePath);
+        if (l_lineEdit.text().isEmpty())
+            m_config.addNote(l_filePath);
+        else
+            m_config.addNote(l_lineEdit.text().toUInt(), l_filePath);
         saveCurrentInstrument();
     }
 }
@@ -128,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent)
     l_createNoteAction->connect(l_createNoteAction, &QAction::triggered, this, &MainWindow::createNoteWidget);
     menuBar()->addAction(l_createNoteAction);
 
-    loadInstrument("../instruments.json");
+    loadNotesForInstrument("../instruments.json");
 }
 
 MainWindow::~MainWindow()
@@ -139,22 +150,30 @@ MainWindow::~MainWindow()
 void MainWindow::saveCurrentInstrument(void) const
 {
     QJsonObject l_root;
-    QJsonArray l_jsonPaths;
-    for (auto l_notePath : m_notesPaths) {
-        l_jsonPaths.push_back(l_notePath);
+    QJsonObject l_jsonNotes;
+    for (auto l_note = m_config.getNotes().constKeyValueBegin(); l_note != m_config.getNotes().constKeyValueEnd(); ++l_note) {
+        l_jsonNotes.insert(QString::number(l_note->first), l_note->second);
     }
-    l_root["instrument"] = l_jsonPaths;
+    // TODO : replace with actual current instrument
+    l_root["instrument"] = l_jsonNotes;
     if (!saveJsonObject(l_root, "../instruments.json"))
         return ;
 }
 
-void MainWindow::loadInstrument(const std::string &p_instrumentPath)
+void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
 {
     QJsonObject l_root;
-    if (!loadJsonObjectFromFile(l_root, p_instrumentPath))
+    if (!loadJsonObjectFromFile(l_root, p_instrumentPath)) {
+        qWarning("Failed to load instrument json");
         return ;
-    QJsonArray l_array = l_root["instrument"].toArray();
-    for (auto l_elem : l_array) {
-        m_notesPaths.push_back(l_elem.toString());
     }
+    QVector<QString> l_notesPaths;
+    QMap<uint, QString> l_notes;
+    // TODO : get from actual current instrument
+    QJsonObject l_jsonNotes = l_root["instrument"].toObject();
+    for (auto l_jsonKey : l_jsonNotes.keys()) {
+        l_notes[l_jsonKey.toUInt()] = l_jsonNotes.value(l_jsonKey).toString();
+    }
+    qDebug() << "Loaded notes : " << l_notes;
+    m_config.setNotes(l_notes);
 }

@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     CentralWidget l_centralWidget;
 
+    l_centralWidget.setConfig(&w.m_config);
     w.setCentralWidget(&l_centralWidget);
     w.show();
     return a.exec();

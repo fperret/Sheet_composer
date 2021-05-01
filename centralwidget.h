@@ -10,6 +10,7 @@
 
 #include "Note.h"
 #include "clickablelabel.h"
+#include "config.h"
 
 class CentralWidget : public QWidget
 {
@@ -23,6 +24,8 @@ public:
     void serializeSheet(QJsonObject &p_jsonOut) const;
     void unserializeSheet(QJsonObject &p_jsonIn);
 
+    void setConfig(Config *p_config);
+
 public Q_SLOTS:
     void imageClicked();
     void popupNoteClicked();
@@ -34,6 +37,7 @@ private:
     QVector<Note *> m_notes;
     Note *m_imageSelected;
     ClickableLabel *m_imageAdd;
+    Config *m_config;
 
     int m_maxColumns;
     // TODO : Remove
