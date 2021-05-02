@@ -8,7 +8,6 @@
 
 #include <QJsonObject>
 
-#include "Note.h"
 #include "clickablelabel.h"
 #include "config.h"
 
@@ -19,10 +18,8 @@ public:
     explicit CentralWidget(QWidget *parent = nullptr);
     ~CentralWidget();
 
-    void createSheetDisplay();
-
+    void loadSheetFromJson(const QJsonObject &p_jsonIn);
     void serializeSheet(QJsonObject &p_jsonOut) const;
-    void unserializeSheet(QJsonObject &p_jsonIn);
 
     void setConfig(Config *p_config);
 
@@ -33,8 +30,8 @@ public Q_SLOTS:
 
 private:
     QGridLayout *m_baseLayout;
-    QVector<Note *> m_notes;
-    Note *m_imageSelected;
+    QVector<uint *> m_notes;
+    uint *m_imageSelected;
     ClickableLabel *m_imageAdd;
     Config *m_config;
 
@@ -45,6 +42,8 @@ private:
     int m_currentLastColumn;
     int m_currentLastRow;
 
+    void initSheetDisplay();
+
     void changeNoteValue();
     void logCurrentNotes() const;
     void deleteCurrentNotes();
@@ -54,6 +53,9 @@ private:
     void placeAddImage();
 
     void addNoteToChoices(QGridLayout *p_layout, uint p_val, const QString &p_imagePath, size_t p_row, size_t p_column);
+
+    void unserializeSheet(const QJsonObject &p_jsonIn);
+    void createSheetDisplay();
 
 signals:
 

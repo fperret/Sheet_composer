@@ -16,7 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Note.cpp \
+    QtUtils.cpp \
     centralwidget.cpp \
     clickablelabel.cpp \
     config.cpp \
@@ -27,7 +27,7 @@ SOURCES += \
     sheetNewNote.cpp
 
 HEADERS += \
-    Note.h \
+    QtUtils.h \
     Utility.h \
     centralwidget.h \
     clickablelabel.h \

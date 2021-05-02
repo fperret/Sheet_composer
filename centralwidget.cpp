@@ -14,23 +14,12 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-#include "Note.h"
 #include "clickablelabel.h"
+#include "QtUtils.h"
 
 void CentralWidget::setConfig(Config *p_config)
 {
     m_config = p_config;
-}
-
-bool isNoteValid(const NoteVal p_note)
-{
-    return (p_note == DO
-            || p_note == RE
-            || p_note == MI
-            || p_note == FA
-            || p_note == SO
-            || p_note == LA
-            || p_note == SI);
 }
 
 void CentralWidget::addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget)
@@ -59,7 +48,7 @@ void CentralWidget::addNoteToSheet(const uint &p_noteVal)
     ClickableLabel *l_imageLabel = new ClickableLabel(this);
     l_imageLabel->setPixmap(l_image);
     l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
-    qDebug() << m_baseLayout->rowCount() << " / " << m_baseLayout->columnCount();
+    qDebug() << "rowCount : " << m_baseLayout->rowCount() << " / columnCount " << m_baseLayout->columnCount();
 
     addWidgetInLastPos(m_baseLayout, l_imageLabel);
     connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
@@ -75,64 +64,62 @@ void CentralWidget::changeNoteValue()
     if (!m_imageSelected)
         return ;
 
-    m_imageSelected->setVal(NoteVal::DO);
+    *m_imageSelected = 1;
 }
 
 void CentralWidget::logCurrentNotes() const
 {
     std::string l_log;
     for (auto l_note : m_notes) {
-        qDebug() << l_note->getVal();
+        l_log += std::to_string(*l_note) + "|";
     }
+    qDebug() << "Current notes : " << l_log.c_str();
+}
+
+void CentralWidget::initSheetDisplay()
+{
+    m_currentLastColumn = 0;
+    m_currentLastRow = 0;
+    deleteWidgetsFromLayout(m_baseLayout);
+}
+
+void CentralWidget::loadSheetFromJson(const QJsonObject &p_jsonIn)
+{
+    unserializeSheet(p_jsonIn);
+    initSheetDisplay();
+    createSheetDisplay();
 }
 
 void CentralWidget::createSheetDisplay()
 {
     for (auto l_note : m_notes) {
-        addNoteToSheet(l_note->getVal());
+        addNoteToSheet(*l_note);
     }
 }
 
 void CentralWidget::serializeSheet(QJsonObject &p_jsonOut) const
 {
     QJsonArray l_new;
+    // l_note can theoretically be > max size of int
+    // but anyway l_note should be changed to a string in the future
     for (auto l_note : m_notes) {
-        l_new.push_back(l_note->getVal());
+        qDebug() << static_cast<int>(*l_note);
+        l_new.push_back(QJsonValue(static_cast<int>(*l_note)));
         p_jsonOut.insert("", l_new);
     }
+    qDebug() << p_jsonOut;
 }
 
-void CentralWidget::unserializeSheet(QJsonObject &p_jsonIn)
+void CentralWidget::unserializeSheet(const QJsonObject &p_jsonIn)
 {
     QJsonArray l_array = p_jsonIn[""].toArray();
 
-    QVector<Note *> new_notes;
-    for (auto l_elem : l_array) {
-        QVariant l_value(l_elem.toInt());
-        Note *l_note = new Note(l_value.value<NoteVal>());
-
-        if (isNoteValid(l_note->getVal()))
-            new_notes.push_back(l_note);
-        else {// Generer une fenetre d'erreur
-            qWarning() << "Invalid value " << l_value << " for note in file";
-            delete l_note;
-            return ;
-        }
-    }
-
-    // use QVector::swap() ?
     deleteCurrentNotes();
-    m_notes = new_notes;
-    logCurrentNotes();
-}
-
-
-void CentralWidget::deleteCurrentNotes()
-{
-    for (auto l_elem : m_notes) {
-        delete l_elem;
+    for (auto l_elem : l_array) {
+        uint *l_noteVal = new uint(l_elem.toInt());
+        m_notes.push_back(l_noteVal);
     }
-    m_notes.clear();
+    logCurrentNotes();
 }
 
 CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent)
@@ -160,6 +147,14 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent)
     m_imageAdd->setStyleSheet("QLabel { background-color : red; }");
     placeAddImage();
     connect(m_imageAdd, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
+}
+
+void CentralWidget::deleteCurrentNotes()
+{
+    for (auto l_elem : m_notes) {
+         delete l_elem;
+    }
+    m_notes.clear();
 }
 
 CentralWidget::~CentralWidget()

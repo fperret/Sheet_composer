@@ -13,7 +13,6 @@
 //#include <QJsonArray>
 //#include <QJsonValue>
 
-#include "Note.h"
 //#include "clickablelabel.h"
 
 static const size_t ADD_NOTE_CHOICES_MAX_COLUMNS = 5;
@@ -32,8 +31,10 @@ void CentralWidget::addNoteToChoices(QGridLayout *p_layout, uint p_val, const QS
 
 void CentralWidget::popupNoteClicked()
 {
-    const uint l_val = sender()->property("value").value<uint>();
-    addNoteToSheet(l_val);
+    //const uint l_val = sender()->property("value").value<uint>();
+    uint *l_val = new uint(sender()->property("value").value<uint>());
+    m_notes.push_back(l_val);
+    addNoteToSheet(*l_val);
     placeAddImage();
 }
 

@@ -54,8 +54,7 @@ void MainWindow::openSheet()
     QJsonObject l_root;
 
     loadJsonObjectFromFile(l_root, m_currentSheetPath);
-    ((CentralWidget *)centralWidget())->unserializeSheet(l_root);
-    ((CentralWidget *)centralWidget())->createSheetDisplay();
+    ((CentralWidget *)centralWidget())->loadSheetFromJson(l_root);
 }
 
 /*
