@@ -29,6 +29,9 @@ public Q_SLOTS:
     void addNotePopup();
 
 private:
+    // Path to the "add note" button's imagee
+    const QString ADD_IMAGE_PATH = ":/images/plus_sign.png";
+
     QGridLayout *m_baseLayout;
     QVector<uint *> m_notes;
     uint *m_imageSelected;

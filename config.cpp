@@ -62,3 +62,38 @@ const QMap<uint, QString> &Config::getNotes(void) const
 {
     return m_notes;
 }
+
+void Config::increaseSheetNoteWidth() {
+    setSheetNoteWidth(m_sheetNoteWidth + 1);
+}
+
+void Config::decreaseSheetNoteWidth() {
+    setSheetNoteWidth(m_sheetNoteWidth - 1);
+}
+
+void Config::increaseSheetNoteHeight() {
+    setSheetNoteHeight(m_sheetNoteHeight + 1);
+}
+
+void Config::decreaseSheetNoteHeight() {
+    setSheetNoteHeight(m_sheetNoteHeight - 1);
+}
+
+void Config::setSheetNoteWidth(const int p_newWidth) {
+    if (p_newWidth <= 0)
+        qWarning() << "Cannot set Note width because value is too small";
+    else if (p_newWidth > ABSOLUTE_MAX_NOTE_WIDTH)
+        qWarning() << "Cannot set Note width because value is too big";
+    else
+        m_sheetNoteWidth = p_newWidth;
+}
+
+void Config::setSheetNoteHeight(const int p_newHeight) {
+    if (p_newHeight <= 0)
+        qWarning() << "Cannot set Note height because value is too small";
+    else if (p_newHeight > ABSOLUTE_MAX_NOTE_HEIGHT)
+        qWarning() << "Cannot set Note height because value is too big";
+    else
+        m_sheetNoteHeight = p_newHeight;
+    qDebug() << "New height : " << m_sheetNoteHeight;
+}

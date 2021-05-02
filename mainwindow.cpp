@@ -23,14 +23,33 @@ void MainWindow::createToolBar()
     // toolbar is a line below the menuBar with icons
     QToolBar *l_fileToolBar = addToolBar(("File"));
 
-    l_fileToolBar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    l_fileToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    QAction *l_testAction = new QAction("toto");
+    /*QAction *l_testAction = new QAction("toto");
     l_testAction->setData(1);
     connect(l_testAction, &QAction::triggered, this, &MainWindow::addNewNote);
+    l_fileToolBar->addAction(l_testAction);*/
 
-    l_fileToolBar->addAction(l_testAction);
+    const QIcon l_expandWidthIcon = QIcon(":/images/expand-width.png");
+    QAction *l_expandWidthAction = new QAction(l_expandWidthIcon, tr("Expand width"), this);
+    l_fileToolBar->addAction(l_expandWidthAction);
 
+    const QIcon l_reduceWidthIcon = QIcon(":/images/reduce-width.png");
+    QAction *l_reduceWidthAction = new QAction(l_reduceWidthIcon, tr("Reduce width"), this);
+    l_fileToolBar->addAction(l_reduceWidthAction);
+
+    const QIcon l_expandHeightIcon = QIcon(":/images/expand-height.png");
+    QAction *l_expandHeightAction = new QAction(l_expandHeightIcon, tr("Expand height"), this);
+    l_fileToolBar->addAction(l_expandHeightAction);
+
+    const QIcon l_reduceHeightIcon = QIcon(":/images/reduce-height.png");
+    QAction *l_reduceHeightAction = new QAction(l_reduceHeightIcon, tr("Reduce height"), this);
+    l_fileToolBar->addAction(l_reduceHeightAction);
+    //QObject::connect(l_reduceHeightAction, &QAction::triggered, &m_config, &Config::decreaseSheetNoteHeight);
+    // il faut que config derive de qobject ou bien que la methode dans config soit static
+    connect(l_reduceHeightAction, &QAction::triggered, &Config::decreaseSheetNoteHeight);
+
+    //menuBar()->add
     /*const QIcon testIcon = QIcon
 
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
@@ -138,6 +157,10 @@ MainWindow::MainWindow(QWidget *parent)
     l_createNoteAction->connect(l_createNoteAction, &QAction::triggered, this, &MainWindow::createNoteWidget);
     menuBar()->addAction(l_createNoteAction);
 
+    QAction *l_settingsAction = new QAction(tr("Settings"), this);
+    l_settingsAction->connect(l_settingsAction, &QAction::triggered, this, &MainWindow::editSettings);
+    menuBar()->addAction(l_settingsAction);
+
     loadNotesForInstrument("../instruments.json");
 }
 
@@ -175,4 +198,9 @@ void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
     }
     qDebug() << "Loaded notes : " << l_notes;
     m_config.setNotes(l_notes);
+}
+
+void MainWindow::editSettings()
+{
+
 }

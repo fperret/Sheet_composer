@@ -10,5 +10,9 @@
         <file>images/LA.png</file>
         <file>images/RE.png</file>
         <file>images/plus_sign.png</file>
+        <file>images/expand-height.png</file>
+        <file>images/expand-width.png</file>
+        <file>images/reduce-height.png</file>
+        <file>images/reduce-width.png</file>
     </qresource>
 </RCC>

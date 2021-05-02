@@ -23,6 +23,7 @@ public Q_SLOTS:
     bool saveSheet() const;
     void openSheet();
     void createNoteWidget();
+    void editSettings();
 
 private:
     Ui::MainWindow *ui;

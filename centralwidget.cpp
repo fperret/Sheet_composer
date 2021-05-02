@@ -37,6 +37,15 @@ void CentralWidget::addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget)
 
 void CentralWidget::placeAddImage()
 {
+    // When we clear the sheet display we delete all widgets on it including this one
+    // So we need to recreate it
+    if (!m_imageAdd) {
+        QPixmap l_addImage(ADD_IMAGE_PATH);
+        m_imageAdd = new ClickableLabel(this);
+        m_imageAdd->setPixmap(l_addImage);
+        m_imageAdd->setStyleSheet("QLabel { background-color : red; }");
+        connect(m_imageAdd, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
+    }
     m_baseLayout->addWidget(m_imageAdd, m_currentLastRow, m_currentLastColumn);
 }
 
@@ -48,6 +57,8 @@ void CentralWidget::addNoteToSheet(const uint &p_noteVal)
     ClickableLabel *l_imageLabel = new ClickableLabel(this);
     l_imageLabel->setPixmap(l_image);
     l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
+    l_imageLabel->setFixedSize(150, 250);
+    l_imageLabel->setScaledContents(true);
     qDebug() << "rowCount : " << m_baseLayout->rowCount() << " / columnCount " << m_baseLayout->columnCount();
 
     addWidgetInLastPos(m_baseLayout, l_imageLabel);
@@ -81,6 +92,7 @@ void CentralWidget::initSheetDisplay()
     m_currentLastColumn = 0;
     m_currentLastRow = 0;
     deleteWidgetsFromLayout(m_baseLayout);
+    m_imageAdd = nullptr;
 }
 
 void CentralWidget::loadSheetFromJson(const QJsonObject &p_jsonIn)
@@ -95,6 +107,7 @@ void CentralWidget::createSheetDisplay()
     for (auto l_note : m_notes) {
         addNoteToSheet(*l_note);
     }
+    placeAddImage();
 }
 
 void CentralWidget::serializeSheet(QJsonObject &p_jsonOut) const
@@ -126,6 +139,7 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent)
 {
     m_baseLayout = new QGridLayout(this);
     m_imageSelected = nullptr;
+    m_imageAdd = nullptr;
 
     m_maxColumns = 5;
     m_maxRows = 5;
@@ -140,13 +154,7 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent)
         m_baseLayout->setRowStretch(i, 1);
     }
 
-    // Button ADD
-    QPixmap l_addImage(":/images/plus_sign.png");
-    m_imageAdd = new ClickableLabel(this);
-    m_imageAdd->setPixmap(l_addImage);
-    m_imageAdd->setStyleSheet("QLabel { background-color : red; }");
     placeAddImage();
-    connect(m_imageAdd, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
 }
 
 void CentralWidget::deleteCurrentNotes()
