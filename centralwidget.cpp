@@ -33,45 +33,6 @@ bool isNoteValid(const NoteVal p_note)
             || p_note == SI);
 }
 
-const std::string getNoteImagePath(const NoteVal &p_note)
-{
-    switch (p_note)
-    {
-        case DO:
-            return (":/images/DO.png");
-            break;
-
-        case RE:
-            return (":/images/RE.png");
-            break;
-
-        case MI:
-            return (":/images/MI.png");
-            break;
-
-        case FA:
-            return (":/images/FA.png");
-            break;
-
-        case SO:
-            return (":/images/SO.png");
-            break;
-
-        case LA:
-            return (":/images/LA.png");
-            break;
-
-        case SI:
-            return (":/images/SI.png");
-            break;
-
-        default:
-            qWarning() << "Note unknown";
-            // TODO : add blank image
-            return (":/images/blank.png");
-    }
-}
-
 void CentralWidget::addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget)
 {
     p_layout->addWidget(p_widget, m_currentLastRow, m_currentLastColumn);
@@ -90,26 +51,18 @@ void CentralWidget::placeAddImage()
     m_baseLayout->addWidget(m_imageAdd, m_currentLastRow, m_currentLastColumn);
 }
 
-void CentralWidget::addNoteToSheet(const NoteVal &p_note)
+void CentralWidget::addNoteToSheet(const uint &p_noteVal)
 {
-    const std::string l_imagePath = getNoteImagePath(p_note);
-    QPixmap l_image(l_imagePath.c_str());
-    //QLabel *l_imageLabel = new QLabel();
+    const QString &l_imagePath = m_config->getNotes()[p_noteVal];
+    QPixmap l_image(l_imagePath);
 
     ClickableLabel *l_imageLabel = new ClickableLabel(this);
     l_imageLabel->setPixmap(l_image);
     l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
-qDebug() << m_baseLayout->rowCount() << " / " << m_baseLayout->columnCount();
+    qDebug() << m_baseLayout->rowCount() << " / " << m_baseLayout->columnCount();
 
     addWidgetInLastPos(m_baseLayout, l_imageLabel);
-    //p_layout->addWidget(l_imageLabel, m_currentLastRow, m_currentLastColumn - 1);
     connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
-    //p_layout->setColumnStretch(p_layout->columnCount() - 1, 2);
-}
-
-void CentralWidget::addNote()
-{
-
 }
 
 void CentralWidget::imageClicked()

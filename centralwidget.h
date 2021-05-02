@@ -29,7 +29,6 @@ public:
 public Q_SLOTS:
     void imageClicked();
     void popupNoteClicked();
-    void addNote();
     void addNotePopup();
 
 private:
@@ -49,12 +48,12 @@ private:
     void changeNoteValue();
     void logCurrentNotes() const;
     void deleteCurrentNotes();
-    void addNoteToSheet(const NoteVal &p_note);
+    void addNoteToSheet(const uint &p_noteVal);
 
     void addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget);
     void placeAddImage();
 
-    void addImageToGrid(QGridLayout *p_layout, const NoteVal &p_note, size_t p_row, size_t p_column);
+    void addNoteToChoices(QGridLayout *p_layout, uint p_val, const QString &p_imagePath, size_t p_row, size_t p_column);
 
 signals:
 
