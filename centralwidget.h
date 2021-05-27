@@ -10,12 +10,13 @@
 
 #include "clickablelabel.h"
 #include "config.h"
+#include "mainwindow.h"
 
 class CentralWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit CentralWidget(QWidget *parent = nullptr);
+    explicit CentralWidget(MainWindow *p_mainWindow, QWidget *parent = nullptr);
     ~CentralWidget();
 
     void loadSheetFromJson(const QJsonObject &p_jsonIn);

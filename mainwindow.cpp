@@ -18,6 +18,12 @@ void MainWindow::addNewNote()
 
 }
 
+void MainWindow::increaseSheetNoteWidth()
+{
+    m_config.increaseSheetNoteWidth();
+    emit redrawNeeded();
+}
+
 void MainWindow::createToolBar()
 {
     // toolbar is a line below the menuBar with icons
@@ -25,37 +31,25 @@ void MainWindow::createToolBar()
 
     l_fileToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    /*QAction *l_testAction = new QAction("toto");
-    l_testAction->setData(1);
-    connect(l_testAction, &QAction::triggered, this, &MainWindow::addNewNote);
-    l_fileToolBar->addAction(l_testAction);*/
-
     const QIcon l_expandWidthIcon = QIcon(":/images/expand-width.png");
     QAction *l_expandWidthAction = new QAction(l_expandWidthIcon, tr("Expand width"), this);
     l_fileToolBar->addAction(l_expandWidthAction);
+    connect(l_expandWidthAction, &QAction::triggered, this, &MainWindow::increaseSheetNoteWidth);
 
     const QIcon l_reduceWidthIcon = QIcon(":/images/reduce-width.png");
     QAction *l_reduceWidthAction = new QAction(l_reduceWidthIcon, tr("Reduce width"), this);
     l_fileToolBar->addAction(l_reduceWidthAction);
+    connect(l_reduceWidthAction, &QAction::triggered, &m_config, &Config::decreaseSheetNoteWidth);
 
     const QIcon l_expandHeightIcon = QIcon(":/images/expand-height.png");
     QAction *l_expandHeightAction = new QAction(l_expandHeightIcon, tr("Expand height"), this);
     l_fileToolBar->addAction(l_expandHeightAction);
+    connect(l_expandHeightAction, &QAction::triggered, &m_config, &Config::increaseSheetNoteHeight);
 
     const QIcon l_reduceHeightIcon = QIcon(":/images/reduce-height.png");
     QAction *l_reduceHeightAction = new QAction(l_reduceHeightIcon, tr("Reduce height"), this);
     l_fileToolBar->addAction(l_reduceHeightAction);
-    //QObject::connect(l_reduceHeightAction, &QAction::triggered, &m_config, &Config::decreaseSheetNoteHeight);
-    // il faut que config derive de qobject ou bien que la methode dans config soit static
-    connect(l_reduceHeightAction, &QAction::triggered, &Config::decreaseSheetNoteHeight);
-
-    //menuBar()->add
-    /*const QIcon testIcon = QIcon
-
-    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
-    QAction *newAction = new QAction(newIcon, tr("&New"), this);
-    l_fileToolBar->addAction(newAction);*/
-
+    connect(l_reduceHeightAction, &QAction::triggered, &m_config, &Config::decreaseSheetNoteHeight);
 }
 
 bool MainWindow::saveSheet() const
@@ -129,6 +123,7 @@ void MainWindow::createNoteWidget()
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
+      m_config(this),
       ui(new Ui::MainWindow),
       m_currentSheetPath("../toto.json")
 {

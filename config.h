@@ -3,12 +3,13 @@
 
 #include <Qt>
 #include <QtCore>
+#include <QApplication>
 
-class Config
+class Config : public QObject
 {
-
+    Q_OBJECT
 public:
-    Config();
+    Config(QObject *parent);
     ~Config();
 
     bool addNote(const QString &p_notePath);
@@ -24,13 +25,17 @@ public:
         return m_sheetNoteWidth;
     }
     void setSheetNoteWidth(const int p_newWidth);
-    void increaseSheetNoteWidth();
-    void decreaseSheetNoteWidth();
+
 
     int getSheetNoteHeight(void) const {
         return m_sheetNoteHeight;
     }
     void setSheetNoteHeight(const int p_newHeight);
+
+
+public Q_SLOTS:
+    void increaseSheetNoteWidth();
+    void decreaseSheetNoteWidth(bool test);
     void increaseSheetNoteHeight();
     void decreaseSheetNoteHeight();
 

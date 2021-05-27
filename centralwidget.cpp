@@ -17,6 +17,8 @@
 #include "clickablelabel.h"
 #include "QtUtils.h"
 
+class MainWindow;
+
 void CentralWidget::setConfig(Config *p_config)
 {
     m_config = p_config;
@@ -135,8 +137,9 @@ void CentralWidget::unserializeSheet(const QJsonObject &p_jsonIn)
     logCurrentNotes();
 }
 
-CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent)
+CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidget(parent)
 {
+    connect(p_mainWindow, &MainWindow::redrawNeeded, this, &CentralWidget::createSheetDisplay);
     m_baseLayout = new QGridLayout(this);
     m_imageSelected = nullptr;
     m_imageAdd = nullptr;

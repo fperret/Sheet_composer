@@ -1,6 +1,6 @@
 #include "config.h"
 
-Config::Config()
+Config::Config(QObject *parent) : QObject(parent)
 {
 
 }
@@ -67,7 +67,7 @@ void Config::increaseSheetNoteWidth() {
     setSheetNoteWidth(m_sheetNoteWidth + 1);
 }
 
-void Config::decreaseSheetNoteWidth() {
+void Config::decreaseSheetNoteWidth(bool test) {
     setSheetNoteWidth(m_sheetNoteWidth - 1);
 }
 
