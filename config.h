@@ -35,7 +35,7 @@ public:
 
 public Q_SLOTS:
     void increaseSheetNoteWidth();
-    void decreaseSheetNoteWidth(bool test);
+    void decreaseSheetNoteWidth();
     void increaseSheetNoteHeight();
     void decreaseSheetNoteHeight();
 
@@ -46,10 +46,12 @@ private:
     QMap<uint, QString> m_notes;
 
     int m_sheetNoteWidth = 100;
-    int m_sheetNoteHeight = 250;
+    //int m_sheetNoteHeight = 250;
+    int m_sheetNoteHeight = 600;
 
     const int ABSOLUTE_MAX_NOTE_HEIGHT = 1000;
     const int ABSOLUTE_MAX_NOTE_WIDTH = 1000;
 };
 
 #endif // CONFIG_H
+

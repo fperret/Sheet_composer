@@ -67,7 +67,7 @@ void Config::increaseSheetNoteWidth() {
     setSheetNoteWidth(m_sheetNoteWidth + 1);
 }
 
-void Config::decreaseSheetNoteWidth(bool test) {
+void Config::decreaseSheetNoteWidth() {
     setSheetNoteWidth(m_sheetNoteWidth - 1);
 }
 
@@ -86,6 +86,7 @@ void Config::setSheetNoteWidth(const int p_newWidth) {
         qWarning() << "Cannot set Note width because value is too big";
     else
         m_sheetNoteWidth = p_newWidth;
+    qDebug() << "New width " << m_sheetNoteWidth;
 }
 
 void Config::setSheetNoteHeight(const int p_newHeight) {

@@ -51,7 +51,7 @@ private:
     void changeNoteValue();
     void logCurrentNotes() const;
     void deleteCurrentNotes();
-    void addNoteToSheet(const uint &p_noteVal);
+    void drawNoteToSheet(const uint &p_noteVal);
 
     void addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget);
     void placeAddImage();
@@ -60,6 +60,7 @@ private:
 
     void unserializeSheet(const QJsonObject &p_jsonIn);
     void createSheetDisplay();
+    void resizeNotesDisplay();
 
 signals:
 

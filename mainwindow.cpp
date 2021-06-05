@@ -18,12 +18,6 @@ void MainWindow::addNewNote()
 
 }
 
-void MainWindow::increaseSheetNoteWidth()
-{
-    m_config.increaseSheetNoteWidth();
-    emit redrawNeeded();
-}
-
 void MainWindow::createToolBar()
 {
     // toolbar is a line below the menuBar with icons
@@ -34,22 +28,34 @@ void MainWindow::createToolBar()
     const QIcon l_expandWidthIcon = QIcon(":/images/expand-width.png");
     QAction *l_expandWidthAction = new QAction(l_expandWidthIcon, tr("Expand width"), this);
     l_fileToolBar->addAction(l_expandWidthAction);
-    connect(l_expandWidthAction, &QAction::triggered, this, &MainWindow::increaseSheetNoteWidth);
+    connect(l_expandWidthAction, &QAction::triggered, this, [this]() {
+        m_config.increaseSheetNoteWidth();
+        emit resizeNeeded();
+    });
 
     const QIcon l_reduceWidthIcon = QIcon(":/images/reduce-width.png");
     QAction *l_reduceWidthAction = new QAction(l_reduceWidthIcon, tr("Reduce width"), this);
     l_fileToolBar->addAction(l_reduceWidthAction);
-    connect(l_reduceWidthAction, &QAction::triggered, &m_config, &Config::decreaseSheetNoteWidth);
+    connect(l_reduceWidthAction, &QAction::triggered, this, [this]() {
+        m_config.decreaseSheetNoteWidth();
+        emit resizeNeeded();
+    });
 
     const QIcon l_expandHeightIcon = QIcon(":/images/expand-height.png");
     QAction *l_expandHeightAction = new QAction(l_expandHeightIcon, tr("Expand height"), this);
     l_fileToolBar->addAction(l_expandHeightAction);
-    connect(l_expandHeightAction, &QAction::triggered, &m_config, &Config::increaseSheetNoteHeight);
+    connect(l_expandHeightAction, &QAction::triggered, this, [this]() {
+        m_config.increaseSheetNoteHeight();
+        emit resizeNeeded();
+    });
 
     const QIcon l_reduceHeightIcon = QIcon(":/images/reduce-height.png");
     QAction *l_reduceHeightAction = new QAction(l_reduceHeightIcon, tr("Reduce height"), this);
     l_fileToolBar->addAction(l_reduceHeightAction);
-    connect(l_reduceHeightAction, &QAction::triggered, &m_config, &Config::decreaseSheetNoteHeight);
+    connect(l_reduceHeightAction, &QAction::triggered, this, [this]() {
+        m_config.decreaseSheetNoteHeight();
+        emit resizeNeeded();
+    });
 }
 
 bool MainWindow::saveSheet() const

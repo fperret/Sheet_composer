@@ -19,5 +19,6 @@ void ClickableLabel::mousePressEvent(QMouseEvent *p_event)
 {
     qDebug() << "Label " << objectName() << " clicked";
     (void)p_event;
+    qDebug() << "Size : " << size();
     emit clicked();
 }

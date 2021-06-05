@@ -33,7 +33,7 @@ void CentralWidget::popupNoteClicked()
 {
     uint *l_val = new uint(sender()->property("value").value<uint>());
     m_notes.push_back(l_val);
-    addNoteToSheet(*l_val);
+    drawNoteToSheet(*l_val);
     placeAddImage();
 }
 

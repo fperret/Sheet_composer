@@ -19,6 +19,33 @@
 
 class MainWindow;
 
+CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidget(parent)
+{
+    connect(p_mainWindow, &MainWindow::resizeNeeded, this, &CentralWidget::resizeNotesDisplay);
+    m_config = &p_mainWindow->m_config;
+    m_baseLayout = new QGridLayout(this);
+
+    m_imageSelected = nullptr;
+    m_imageAdd = nullptr;
+
+    m_maxColumns = 5;
+    m_maxRows = 5;
+    m_currentLastColumn = 0;
+    m_currentLastRow = 0;
+
+    m_baseLayout->setSpacing(1);
+    for (int i = 0; i < m_maxColumns; ++i) {
+        m_baseLayout->setColumnStretch(i, 0);
+        //m_baseLayout->setColumnMinimumWidth(i, 100);
+    }
+    for (int i = 0; i < m_maxRows; ++i) {
+        m_baseLayout->setRowStretch(i, 0);
+        //m_baseLayout->setRowMinimumHeight(i, 600);
+    }
+
+    placeAddImage();
+}
+
 void CentralWidget::setConfig(Config *p_config)
 {
     m_config = p_config;
@@ -48,10 +75,12 @@ void CentralWidget::placeAddImage()
         m_imageAdd->setStyleSheet("QLabel { background-color : red; }");
         connect(m_imageAdd, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
     }
+    m_imageAdd->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_baseLayout->addWidget(m_imageAdd, m_currentLastRow, m_currentLastColumn);
+    m_imageAdd->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());
 }
 
-void CentralWidget::addNoteToSheet(const uint &p_noteVal)
+void CentralWidget::drawNoteToSheet(const uint &p_noteVal)
 {
     const QString &l_imagePath = m_config->getNotes()[p_noteVal];
     QPixmap l_image(l_imagePath);
@@ -59,11 +88,17 @@ void CentralWidget::addNoteToSheet(const uint &p_noteVal)
     ClickableLabel *l_imageLabel = new ClickableLabel(this);
     l_imageLabel->setPixmap(l_image);
     l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
-    l_imageLabel->setFixedSize(150, 250);
-    l_imageLabel->setScaledContents(true);
+    //l_imageLabel->setScaledContents(true);
+    l_imageLabel->setScaledContents(false);
+
     qDebug() << "rowCount : " << m_baseLayout->rowCount() << " / columnCount " << m_baseLayout->columnCount();
 
     addWidgetInLastPos(m_baseLayout, l_imageLabel);
+    l_imageLabel->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());
+    // fixed size ca fonctionne mais il faut modifier la fixed size a chaque fois + ce n'est plus responsive
+    //l_imageLabel->setFixedSize(QSize(100, 600));
+    //l_imageLabel->setMinimumHeight(600);
+
     connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
 }
 
@@ -107,9 +142,22 @@ void CentralWidget::loadSheetFromJson(const QJsonObject &p_jsonIn)
 void CentralWidget::createSheetDisplay()
 {
     for (auto l_note : m_notes) {
-        addNoteToSheet(*l_note);
+        drawNoteToSheet(*l_note);
     }
     placeAddImage();
+    resizeNotesDisplay();
+}
+
+/*
+ * For now this will cause widgets other than the ones for the notes to be resized
+ */
+void CentralWidget::resizeNotesDisplay()
+{
+    for (int i = 0; i < m_baseLayout->count(); ++i) {
+        QWidget *l_widget = m_baseLayout->itemAt(i)->widget();
+        if (l_widget != nullptr)
+            l_widget->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());
+    }
 }
 
 void CentralWidget::serializeSheet(QJsonObject &p_jsonOut) const
@@ -135,29 +183,6 @@ void CentralWidget::unserializeSheet(const QJsonObject &p_jsonIn)
         m_notes.push_back(l_noteVal);
     }
     logCurrentNotes();
-}
-
-CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidget(parent)
-{
-    connect(p_mainWindow, &MainWindow::redrawNeeded, this, &CentralWidget::createSheetDisplay);
-    m_baseLayout = new QGridLayout(this);
-    m_imageSelected = nullptr;
-    m_imageAdd = nullptr;
-
-    m_maxColumns = 5;
-    m_maxRows = 5;
-    m_currentLastColumn = 0;
-    m_currentLastRow = 0;
-
-    m_baseLayout->setSpacing(1);
-    for (int i = 0; i < m_maxColumns; ++i) {
-        m_baseLayout->setColumnStretch(i, 1);
-    }
-    for (int i = 0; i < m_maxRows; ++i) {
-        m_baseLayout->setRowStretch(i, 1);
-    }
-
-    placeAddImage();
 }
 
 void CentralWidget::deleteCurrentNotes()

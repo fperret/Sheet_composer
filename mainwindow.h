@@ -25,10 +25,8 @@ public Q_SLOTS:
     void createNoteWidget();
     void editSettings();
 
-    void increaseSheetNoteWidth();
-
 Q_SIGNALS:
-    void redrawNeeded(void);
+    void resizeNeeded(void);
 
 private:
     Ui::MainWindow *ui;
