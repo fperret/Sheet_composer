@@ -46,8 +46,7 @@ private:
     QMap<uint, QString> m_notes;
 
     int m_sheetNoteWidth = 100;
-    //int m_sheetNoteHeight = 250;
-    int m_sheetNoteHeight = 600;
+    int m_sheetNoteHeight = 250;
 
     const int ABSOLUTE_MAX_NOTE_HEIGHT = 1000;
     const int ABSOLUTE_MAX_NOTE_WIDTH = 1000;

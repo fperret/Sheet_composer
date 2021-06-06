@@ -34,11 +34,19 @@ void CentralWidget::popupNoteClicked()
     uint *l_val = new uint(sender()->property("value").value<uint>());
     m_notes.push_back(l_val);
     drawNoteToSheet(*l_val);
-    placeAddImage();
+    placeAddImage(false);
+
+    // If we added the first note to a row, place the "add image" button for the next row
+    if (m_lastColumns[m_selectedRow] == 1)
+        placeAddImage(true);
 }
 
 void CentralWidget::addNotePopup()
 {
+    if (sender()) {
+        m_selectedRow = sender()->property(ADD_IMAGE_ROW).value<int>();
+    }
+
     QDialog *l_dialog = new QDialog(this);
     QGridLayout *l_popupGrid = new QGridLayout(l_dialog);
     const QMap<uint, QString> &l_configNotes = m_config->getNotes();

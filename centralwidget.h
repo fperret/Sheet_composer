@@ -32,19 +32,22 @@ public Q_SLOTS:
 private:
     // Path to the "add note" button's imagee
     const QString ADD_IMAGE_PATH = ":/images/plus_sign.png";
+    const char * const ADD_IMAGE_ROW = "row";
 
     QGridLayout *m_baseLayout;
     QVector<uint *> m_notes;
     uint *m_imageSelected;
-    ClickableLabel *m_imageAdd;
+    QVector<ClickableLabel *> m_imageAdd;
     Config *m_config;
 
     int m_maxColumns;
     // TODO : Remove
     // We should have a way to add new rows without changing the size of the current ones
     int m_maxRows;
-    int m_currentLastColumn;
+    // Last current column of each row
+    QVector<uint32_t> m_lastColumns;
     int m_currentLastRow;
+    int m_selectedRow;
 
     void initSheetDisplay();
 
@@ -53,8 +56,8 @@ private:
     void deleteCurrentNotes();
     void drawNoteToSheet(const uint &p_noteVal);
 
-    void addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget);
-    void placeAddImage();
+    void addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget);
+    void placeAddImage(const bool p_nextRow);
 
     void addNoteToChoices(QGridLayout *p_layout, uint p_val, const QString &p_imagePath, size_t p_row, size_t p_column);
 

@@ -26,24 +26,26 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidge
     m_baseLayout = new QGridLayout(this);
 
     m_imageSelected = nullptr;
-    m_imageAdd = nullptr;
+    //m_imageAdd = nullptr;
 
     m_maxColumns = 5;
     m_maxRows = 5;
-    m_currentLastColumn = 0;
     m_currentLastRow = 0;
+    m_selectedRow = 0;
 
     m_baseLayout->setSpacing(1);
+
     for (int i = 0; i < m_maxColumns; ++i) {
-        m_baseLayout->setColumnStretch(i, 0);
-        //m_baseLayout->setColumnMinimumWidth(i, 100);
+        m_baseLayout->setColumnStretch(i, 1);
+        m_lastColumns.push_back(0);
     }
     for (int i = 0; i < m_maxRows; ++i) {
-        m_baseLayout->setRowStretch(i, 0);
-        //m_baseLayout->setRowMinimumHeight(i, 600);
+        m_baseLayout->setRowStretch(i, 1);
+        m_lastColumns.push_back(0);
     }
 
-    placeAddImage();
+    placeAddImage(false);
+    //placeAddImage(true);
 }
 
 void CentralWidget::setConfig(Config *p_config)
@@ -51,33 +53,31 @@ void CentralWidget::setConfig(Config *p_config)
     m_config = p_config;
 }
 
-void CentralWidget::addWidgetInLastPos(QGridLayout *p_layout, QWidget *p_widget)
+void CentralWidget::addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget)
 {
-    p_layout->addWidget(p_widget, m_currentLastRow, m_currentLastColumn);
-
-    // This needs to stay before addWidget because we use these values to set the "Add" image
-    if (m_currentLastColumn == m_maxColumns - 1) {
-        m_currentLastColumn = 0;
-        m_currentLastRow += 1;
-    } else {
-        m_currentLastColumn += 1;
-    }
+    p_layout->addWidget(p_widget, m_selectedRow, m_lastColumns[m_selectedRow]);
+    m_lastColumns[m_selectedRow]++;
 }
 
-void CentralWidget::placeAddImage()
+void CentralWidget::placeAddImage(const bool p_nextRow)
 {
+    const int l_row = (p_nextRow ? m_selectedRow + 1 : m_selectedRow);
     // When we clear the sheet display we delete all widgets on it including this one
     // So we need to recreate it
-    if (!m_imageAdd) {
-        QPixmap l_addImage(ADD_IMAGE_PATH);
-        m_imageAdd = new ClickableLabel(this);
-        m_imageAdd->setPixmap(l_addImage);
-        m_imageAdd->setStyleSheet("QLabel { background-color : red; }");
-        connect(m_imageAdd, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
+    while (m_imageAdd.size() <= l_row) {
+        m_imageAdd.push_back(nullptr);
     }
-    m_imageAdd->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_baseLayout->addWidget(m_imageAdd, m_currentLastRow, m_currentLastColumn);
-    m_imageAdd->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());
+
+    ClickableLabel *l_label = m_imageAdd[l_row];
+    if (!l_label) {
+        QPixmap l_addImage(ADD_IMAGE_PATH);
+        l_label = new ClickableLabel(this);
+        l_label->setPixmap(l_addImage);
+        l_label->setStyleSheet("QLabel { background-color : red; }");
+        connect(l_label, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
+    }
+    l_label->setProperty(ADD_IMAGE_ROW, l_row);
+    m_baseLayout->addWidget(l_label, l_row, m_lastColumns[l_row]);
 }
 
 void CentralWidget::drawNoteToSheet(const uint &p_noteVal)
@@ -88,12 +88,11 @@ void CentralWidget::drawNoteToSheet(const uint &p_noteVal)
     ClickableLabel *l_imageLabel = new ClickableLabel(this);
     l_imageLabel->setPixmap(l_image);
     l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
-    //l_imageLabel->setScaledContents(true);
-    l_imageLabel->setScaledContents(false);
+    l_imageLabel->setScaledContents(true);
 
     qDebug() << "rowCount : " << m_baseLayout->rowCount() << " / columnCount " << m_baseLayout->columnCount();
 
-    addWidgetInLastPos(m_baseLayout, l_imageLabel);
+    addWidgetInLastCol(m_baseLayout, l_imageLabel);
     l_imageLabel->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());
     // fixed size ca fonctionne mais il faut modifier la fixed size a chaque fois + ce n'est plus responsive
     //l_imageLabel->setFixedSize(QSize(100, 600));
@@ -104,7 +103,6 @@ void CentralWidget::drawNoteToSheet(const uint &p_noteVal)
 
 void CentralWidget::imageClicked()
 {
-    //m_imageSelected = qobject_cast<ClickableLabel *>(sender());
 }
 
 void CentralWidget::changeNoteValue()
@@ -126,10 +124,8 @@ void CentralWidget::logCurrentNotes() const
 
 void CentralWidget::initSheetDisplay()
 {
-    m_currentLastColumn = 0;
     m_currentLastRow = 0;
     deleteWidgetsFromLayout(m_baseLayout);
-    m_imageAdd = nullptr;
 }
 
 void CentralWidget::loadSheetFromJson(const QJsonObject &p_jsonIn)
@@ -144,7 +140,8 @@ void CentralWidget::createSheetDisplay()
     for (auto l_note : m_notes) {
         drawNoteToSheet(*l_note);
     }
-    placeAddImage();
+    placeAddImage(false);
+    placeAddImage(true);
     resizeNotesDisplay();
 }
 
