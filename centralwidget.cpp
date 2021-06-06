@@ -26,11 +26,9 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidge
     m_baseLayout = new QGridLayout(this);
 
     m_imageSelected = nullptr;
-    //m_imageAdd = nullptr;
 
     m_maxColumns = 5;
     m_maxRows = 5;
-    m_currentLastRow = 0;
     m_selectedRow = 0;
 
     m_baseLayout->setSpacing(1);
@@ -45,7 +43,6 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidge
     }
 
     placeAddImage(false);
-    //placeAddImage(true);
 }
 
 void CentralWidget::setConfig(Config *p_config)
@@ -62,12 +59,13 @@ void CentralWidget::addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget)
 void CentralWidget::placeAddImage(const bool p_nextRow)
 {
     const int l_row = (p_nextRow ? m_selectedRow + 1 : m_selectedRow);
-    // When we clear the sheet display we delete all widgets on it including this one
-    // So we need to recreate it
+
     while (m_imageAdd.size() <= l_row) {
         m_imageAdd.push_back(nullptr);
     }
 
+    // When we clear the sheet display we delete all widgets on it including this one
+    // So we need to recreate it
     ClickableLabel *l_label = m_imageAdd[l_row];
     if (!l_label) {
         QPixmap l_addImage(ADD_IMAGE_PATH);
@@ -124,8 +122,10 @@ void CentralWidget::logCurrentNotes() const
 
 void CentralWidget::initSheetDisplay()
 {
-    m_currentLastRow = 0;
     deleteWidgetsFromLayout(m_baseLayout);
+    m_selectedRow = 0;
+    m_imageSelected = nullptr;
+    m_lastColumns.clear();
 }
 
 void CentralWidget::loadSheetFromJson(const QJsonObject &p_jsonIn)

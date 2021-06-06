@@ -44,9 +44,9 @@ private:
     // TODO : Remove
     // We should have a way to add new rows without changing the size of the current ones
     int m_maxRows;
+
     // Last current column of each row
     QVector<uint32_t> m_lastColumns;
-    int m_currentLastRow;
     int m_selectedRow;
 
     void initSheetDisplay();
