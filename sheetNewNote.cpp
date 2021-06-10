@@ -31,14 +31,16 @@ void CentralWidget::addNoteToChoices(QGridLayout *p_layout, uint p_val, const QS
 
 void CentralWidget::popupNoteClicked()
 {
-    uint *l_val = new uint(sender()->property("value").value<uint>());
-    m_notes.push_back(l_val);
-    drawNoteToSheet(*l_val);
-    placeAddImage(false);
+    int l_val = sender()->property("value").value<int>();
+    if (m_notes.size() <= m_selectedRow)
+        m_notes.insert(m_selectedRow, QVector<int>());
+    m_notes[m_selectedRow].push_back(l_val);
+    drawNoteToSheet(l_val, m_selectedRow);
+    placeAddImage(m_selectedRow);
 
     // If we added the first note to a row, place the "add image" button for the next row
     if (m_lastColumns[m_selectedRow] == 1)
-        placeAddImage(true);
+        placeAddImage(m_selectedRow + 1);
 }
 
 void CentralWidget::addNotePopup()
@@ -49,7 +51,7 @@ void CentralWidget::addNotePopup()
 
     QDialog *l_dialog = new QDialog(this);
     QGridLayout *l_popupGrid = new QGridLayout(l_dialog);
-    const QMap<uint, QString> &l_configNotes = m_config->getNotes();
+    const QMap<int, QString> &l_configNotes = m_config->getNotes();
 
     l_popupGrid->setSpacing(1);
     size_t l_row = 0;

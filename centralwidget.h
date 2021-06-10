@@ -35,8 +35,9 @@ private:
     const char * const ADD_IMAGE_ROW = "row";
 
     QGridLayout *m_baseLayout;
-    QVector<uint *> m_notes;
-    uint *m_imageSelected;
+    // Est ce qu'on a besoin d'avoir les notes ici et celles dans config ?
+    // Ici on n'a pas besoin de stocker le path associe
+    QVector<QVector<int> > m_notes;
     QVector<ClickableLabel *> m_imageAdd;
     Config *m_config;
 
@@ -54,10 +55,10 @@ private:
     void changeNoteValue();
     void logCurrentNotes() const;
     void deleteCurrentNotes();
-    void drawNoteToSheet(const uint &p_noteVal);
+    void drawNoteToSheet(const uint &p_noteVal, const int p_row);
 
-    void addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget);
-    void placeAddImage(const bool p_nextRow);
+    void addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget, const int p_row);
+    void placeAddImage(const int p_row);
 
     void addNoteToChoices(QGridLayout *p_layout, uint p_val, const QString &p_imagePath, size_t p_row, size_t p_column);
 

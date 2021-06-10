@@ -191,7 +191,7 @@ void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
         return ;
     }
     QVector<QString> l_notesPaths;
-    QMap<uint, QString> l_notes;
+    QMap<int, QString> l_notes;
     // TODO : get from actual current instrument
     QJsonObject l_jsonNotes = l_root["instrument"].toObject();
     for (auto l_jsonKey : l_jsonNotes.keys()) {

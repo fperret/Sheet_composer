@@ -13,13 +13,13 @@ public:
     ~Config();
 
     bool addNote(const QString &p_notePath);
-    void addNote(const uint &p_value, const QString &p_notePath);
+    void addNote(const int &p_value, const QString &p_notePath);
 
     void setInstruments(const QVector<QString> &p_instruments);
-    void setNotes(const QMap<uint, QString> &p_notes);
+    void setNotes(const QMap<int, QString> &p_notes);
 
     const QVector<QString> &getInstruments(void) const;
-    const QMap<uint, QString> &getNotes(void) const;
+    const QMap<int, QString> &getNotes(void) const;
 
     int getSheetNoteWidth(void) const {
         return m_sheetNoteWidth;
@@ -43,7 +43,9 @@ public Q_SLOTS:
 private:
     QVector<QString> m_instruments;
     // Note : value of note could be a string
-    QMap<uint, QString> m_notes;
+    // All possible notes available
+    // Each key in a row is the value of the note, the value is the path to the image
+    QMap<int, QString> m_notes;
 
     int m_sheetNoteWidth = 100;
     int m_sheetNoteHeight = 250;
