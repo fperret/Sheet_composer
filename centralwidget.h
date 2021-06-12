@@ -41,11 +41,6 @@ private:
     QVector<ClickableLabel *> m_imageAdd;
     Config *m_config;
 
-    int m_maxColumns;
-    // TODO : Remove
-    // We should have a way to add new rows without changing the size of the current ones
-    int m_maxRows;
-
     // Last current column of each row
     QVector<uint32_t> m_lastColumns;
     int m_selectedRow;

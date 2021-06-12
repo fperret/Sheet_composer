@@ -25,21 +25,14 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidge
     m_config = &p_mainWindow->m_config;
     m_baseLayout = new QGridLayout(this);
 
-    m_maxColumns = 5;
-    m_maxRows = 5;
     m_selectedRow = 0;
 
     m_baseLayout->setSpacing(1);
 
-    for (int i = 0; i < m_maxColumns; ++i) {
-        m_baseLayout->setColumnStretch(i, 1);
-    }
-    for (int i = 0; i < m_maxRows; ++i) {
-        m_baseLayout->setRowStretch(i, 1);
-        m_lastColumns.push_back(0);
-    }
-
     placeAddImage(0);
+
+    // At the beginning the rows are super big because they expand to take all available places
+    // could add fake rows at the beginning to even things out
 }
 
 void CentralWidget::setConfig(Config *p_config)
@@ -49,10 +42,15 @@ void CentralWidget::setConfig(Config *p_config)
 
 void CentralWidget::addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget, const int p_row)
 {
-    while (m_lastColumns.size() <= p_row)
+    // Widget is added in the first column of a new row
+    while (m_lastColumns.size() <= p_row) {
+        qDebug() << "Set stretch of row " << p_row;
+        m_baseLayout->setRowStretch(p_row, 1);
         m_lastColumns.push_back(0);
+    }
     p_layout->addWidget(p_widget, p_row, m_lastColumns[p_row]);
-    m_lastColumns[p_row]++;
+    // This will be repeated and do nothing for each row, not sure if it is a problem
+    m_baseLayout->setColumnStretch(m_lastColumns[p_row], 1);
 }
 
 void CentralWidget::placeAddImage(const int p_row)
@@ -72,7 +70,7 @@ void CentralWidget::placeAddImage(const int p_row)
         connect(l_label, &ClickableLabel::clicked, this, &CentralWidget::addNotePopup);
     }
     l_label->setProperty(ADD_IMAGE_ROW, p_row);
-    m_baseLayout->addWidget(l_label, p_row, m_lastColumns[p_row]);
+    addWidgetInLastCol(m_baseLayout, l_label, p_row);
 }
 
 void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
@@ -84,11 +82,10 @@ void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
     l_imageLabel->setPixmap(l_image);
     l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
     l_imageLabel->setScaledContents(true);
-
-    qDebug() << "rowCount : " << m_baseLayout->rowCount() << " / columnCount " << m_baseLayout->columnCount();
-// probleme ici pour quand on unserialize parceque on est sur le bon widget probablement
-    addWidgetInLastCol(m_baseLayout, l_imageLabel, p_row);
     l_imageLabel->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());
+    addWidgetInLastCol(m_baseLayout, l_imageLabel, p_row);
+    m_lastColumns[p_row]++;
+
     // fixed size ca fonctionne mais il faut modifier la fixed size a chaque fois + ce n'est plus responsive
     //l_imageLabel->setFixedSize(QSize(100, 600));
     //l_imageLabel->setMinimumHeight(600);
@@ -136,10 +133,10 @@ void CentralWidget::createSheetDisplay()
         for (auto l_note : l_row) {
             drawNoteToSheet(l_note, l_rowIndex);
         }
+        placeAddImage(l_rowIndex);
         l_rowIndex++;
     }
-    placeAddImage(m_selectedRow);
-    placeAddImage(m_selectedRow + 1);
+    placeAddImage(l_rowIndex);
     resizeNotesDisplay();
 }
 
@@ -182,7 +179,7 @@ void CentralWidget::unserializeSheet(const QJsonObject &p_jsonIn)
             l_rowNotes.push_back(l_elem.toInt());
         }
         m_notes.push_back(l_rowNotes);
-        m_lastColumns.push_back(l_rowNotes.size());
+        m_lastColumns.push_back(0);
     }
     m_lastColumns.push_back(0);
 
