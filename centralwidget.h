@@ -20,7 +20,7 @@ public:
     ~CentralWidget();
 
     void loadSheetFromJson(const QJsonObject &p_jsonIn);
-    void serializeSheet(QJsonObject &p_jsonOut) const;
+    QJsonObject serializeSheet(void) const;
 
     void setConfig(Config *p_config);
 

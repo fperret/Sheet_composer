@@ -20,17 +20,19 @@ public:
 
 public Q_SLOTS:
     void addNewNote();
-    bool saveSheet() const;
+    void saveSheet() const;
     void openSheet();
     void createNoteWidget();
     void editSettings();
+
+    void sheetSaveAs();
 
 Q_SIGNALS:
     void resizeNeeded(void);
 
 private:
     Ui::MainWindow *ui;
-    std::string m_currentSheetPath;
+    QString m_currentSheetPath;
 
     void createToolBar();
     void saveCurrentInstrument(void) const;

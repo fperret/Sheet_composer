@@ -152,20 +152,22 @@ void CentralWidget::resizeNotesDisplay()
     }
 }
 
-void CentralWidget::serializeSheet(QJsonObject &p_jsonOut) const
+QJsonObject CentralWidget::serializeSheet(void) const
 {
+    QJsonObject l_jsonOut;
     QJsonArray l_new;
+
     for (auto l_rowNotes : m_notes) {
         QJsonArray l_rowJson;
         for (auto l_note : l_rowNotes) {
             qDebug() << l_note;
             l_rowJson.push_back(QJsonValue(l_note));
         }
-        l_new.push_back(l_rowJson);
         // use index of row as key ?
-        p_jsonOut.insert("", l_new);
+        l_new.push_back(l_rowJson);
     }
-    qDebug() << p_jsonOut;
+    l_jsonOut.insert("", l_new);
+    return l_jsonOut;
 }
 
 void CentralWidget::unserializeSheet(const QJsonObject &p_jsonIn)

@@ -58,23 +58,31 @@ void MainWindow::createToolBar()
     });
 }
 
-bool MainWindow::saveSheet() const
+void MainWindow::saveSheet() const
 {
-    QJsonObject l_root;
+    QJsonObject l_jsonSheet = ((CentralWidget *)centralWidget())->serializeSheet();
+    saveJsonObject(l_jsonSheet, m_currentSheetPath.toStdString());
+}
 
-    ((CentralWidget *)centralWidget())->serializeSheet(l_root);
-    saveJsonObject(l_root, m_currentSheetPath);
-
-    return true;
+void MainWindow::sheetSaveAs()
+{
+    QString l_selectFile = QFileDialog::getSaveFileName(this, tr("Save as"), m_currentSheetPath, tr("JSON (*.json)"));
+    if (not l_selectFile.isEmpty()) {
+        m_currentSheetPath = l_selectFile;
+        saveSheet();
+    }
 }
 
 void MainWindow::openSheet()
 {
     QJsonObject l_root;
 
-    loadJsonObjectFromFile(l_root, m_currentSheetPath);
+    loadJsonObjectFromFile(l_root, m_currentSheetPath.toStdString());
     ((CentralWidget *)centralWidget())->loadSheetFromJson(l_root);
+
+
 }
+
 
 /*
  * Create a dialog to select an image so that it becomes available as a note to add.
@@ -149,6 +157,10 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *l_saveAction = new QAction(tr("&Save"), this);
     l_saveAction->connect(l_saveAction, &QAction::triggered, this, &MainWindow::saveSheet);
     menuBar()->addAction(l_saveAction);
+
+    QAction *l_saveAsAction = new QAction(tr("&Save As"), this);
+    l_saveAction->connect(l_saveAsAction, &QAction::triggered, this, &MainWindow::sheetSaveAs);
+    menuBar()->addAction(l_saveAsAction);
 
     QAction *l_openAction = new QAction(tr("&Open"), this);
     l_saveAction->connect(l_openAction, &QAction::triggered, this, &MainWindow::openSheet);
