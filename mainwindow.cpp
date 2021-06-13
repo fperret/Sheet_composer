@@ -75,12 +75,12 @@ void MainWindow::sheetSaveAs()
 
 void MainWindow::openSheet()
 {
-    QJsonObject l_root;
-
-    loadJsonObjectFromFile(l_root, m_currentSheetPath.toStdString());
-    ((CentralWidget *)centralWidget())->loadSheetFromJson(l_root);
-
-
+    QString l_selectFile = QFileDialog::getOpenFileName(this, tr("Open file"), m_currentSheetPath, tr("JSON (*.json)"));
+    if (not l_selectFile.isEmpty()) {
+        m_currentSheetPath = l_selectFile;
+        QJsonObject l_root = loadJsonObjectFromFile(m_currentSheetPath.toStdString());
+        ((CentralWidget *)centralWidget())->loadSheetFromJson(l_root);
+    }
 }
 
 
@@ -197,8 +197,8 @@ void MainWindow::saveCurrentInstrument(void) const
 
 void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
 {
-    QJsonObject l_root;
-    if (!loadJsonObjectFromFile(l_root, p_instrumentPath)) {
+    QJsonObject l_root = loadJsonObjectFromFile(p_instrumentPath);
+    if (l_root.isEmpty()) {
         qWarning("Failed to load instrument json");
         return ;
     }

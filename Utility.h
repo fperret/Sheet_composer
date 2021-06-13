@@ -10,6 +10,6 @@ void logJson(const QJsonObject &p_jsonObject);
 
 bool saveJsonObject(const QJsonObject &p_jsonObject, const std::string &p_fileName);
 
-bool loadJsonObjectFromFile(QJsonObject &p_jsonObject, const std::string &p_fileName);
+QJsonObject loadJsonObjectFromFile(const std::string &p_fileName);
 
 #endif // UTILITY_H

@@ -29,17 +29,17 @@ bool saveJsonObject(const QJsonObject &p_jsonObject, const std::string &p_fileNa
     return true;
 }
 
-bool loadJsonObjectFromFile(QJsonObject &p_jsonObject, const std::string &p_fileName)
+QJsonObject loadJsonObjectFromFile(const std::string &p_fileName)
 {
     QFile l_loadFile(QString(p_fileName.c_str()));
 
     // Use ReadWrite to create the file if it does not exists
     if (!l_loadFile.open(QIODevice::ReadWrite)) {
         qWarning() << "Could not open " << p_fileName.c_str() << " when loading.";
-        return false;
+        return QJsonObject();
     }
     QByteArray l_jsonData = l_loadFile.readAll();
     QJsonDocument l_jsonDoc(QJsonDocument::fromJson(l_jsonData));
-    p_jsonObject = l_jsonDoc.object();
-    return true;
+    //l_jsonObject = l_jsonDoc.object();
+    return l_jsonDoc.object();
 }
