@@ -32,7 +32,9 @@ public Q_SLOTS:
 private:
     // Path to the "add note" button's imagee
     const QString ADD_IMAGE_PATH = ":/images/plus_sign.png";
-    const char * const ADD_IMAGE_ROW = "row";
+    const char * const ADD_IMAGE_ROW    = "row";
+    const QString MAIN_GRID_LAYOUT_NAME = "Central QGridLayout";
+    const QString THIS_NAME             = "CentralWidget";
 
     QGridLayout *m_baseLayout;
     // Est ce qu'on a besoin d'avoir les notes ici et celles dans config ?

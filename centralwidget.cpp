@@ -31,6 +31,8 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidge
 
     placeAddImage(0);
 
+    setObjectName(THIS_NAME);
+    m_baseLayout->setObjectName(MAIN_GRID_LAYOUT_NAME);
     // At the beginning the rows are super big because they expand to take all available places
     // could add fake rows at the beginning to even things out
 }
@@ -95,6 +97,41 @@ void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
 
 void CentralWidget::imageClicked()
 {
+    // We probably do not need to do all that to get the layout because there is a 99% chance
+    // the only layout will always be m_baseLayout but better be safe than sorry
+    QWidget *l_senderParent = qobject_cast<QWidget *>(sender()->parent());
+    if (l_senderParent == nullptr) {
+        qWarning() << "Parent of caller is not a QWidget";
+        return ;
+    }
+    QGridLayout *l_senderLayout = qobject_cast<QGridLayout *>(l_senderParent->layout());
+    if (l_senderLayout == nullptr) {
+        qWarning() << "Sender's parent does not have a layout";
+        return ;
+    }
+    QWidget *l_imageClicked = qobject_cast<QWidget *>(sender());
+    if (l_imageClicked == nullptr) {
+        qWarning() << "sender is not a QWidget";
+        return ;
+    }
+    int l_indexOfImageInLayout = l_senderLayout->indexOf(l_imageClicked);
+    if (l_indexOfImageInLayout < 0) {
+        return ;
+    }
+
+    // Dummy value
+    int _;
+    int l_row = -1;
+    int l_col = -1;
+    l_senderLayout->getItemPosition(l_indexOfImageInLayout, &l_row, &l_col, &_, &_);
+    if (l_row <= m_notes.size() && l_col <= m_notes[l_row].size()) {
+        qDebug() << "Clicked on image at pos " << l_row << " " << l_col << " with value " << m_notes[l_row][l_col];
+        return ;
+    }
+
+   // m_selectedRow = ;
+    // mettre une couleur ou un contour
+    // afficher le truc de popup note
 }
 
 void CentralWidget::changeNoteValue()
