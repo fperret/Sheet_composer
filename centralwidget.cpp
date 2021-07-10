@@ -99,31 +99,30 @@ void CentralWidget::imageClicked()
 {
     // We probably do not need to do all that to get the layout because there is a 99% chance
     // the only layout will always be m_baseLayout but better be safe than sorry
-    QWidget *l_senderParent = qobject_cast<QWidget *>(sender()->parent());
-    if (l_senderParent == nullptr) {
-        qWarning() << "Parent of caller is not a QWidget";
-        return ;
-    }
-    QGridLayout *l_senderLayout = qobject_cast<QGridLayout *>(l_senderParent->layout());
-    if (l_senderLayout == nullptr) {
-        qWarning() << "Sender's parent does not have a layout";
-        return ;
-    }
     QWidget *l_imageClicked = qobject_cast<QWidget *>(sender());
     if (l_imageClicked == nullptr) {
         qWarning() << "sender is not a QWidget";
         return ;
     }
-    int l_indexOfImageInLayout = l_senderLayout->indexOf(l_imageClicked);
-    if (l_indexOfImageInLayout < 0) {
-        return ;
-    }
 
+    const QLayout *l_imageParentLayout = getLayoutOfParent(l_imageClicked);
+    if (l_imageParentLayout == nullptr || l_imageParentLayout != m_baseLayout)
+        return ;
+
+    const int l_indexOfImageInLayout = l_imageParentLayout->indexOf(l_imageClicked);
+    if (l_indexOfImageInLayout < 0)
+        return ;
+
+    // Unnecessary for now because we know the parent layout is m_baseLayout which is a QGridLayout *
+    // But just in case we change the type later, extra check here
+    const QGridLayout *l_gridParentLayout = qobject_cast<const QGridLayout *>(l_imageParentLayout);
+    if (l_gridParentLayout == nullptr)
+        return ;
     // Dummy value
     int _;
     int l_row = -1;
     int l_col = -1;
-    l_senderLayout->getItemPosition(l_indexOfImageInLayout, &l_row, &l_col, &_, &_);
+    l_gridParentLayout->getItemPosition(l_indexOfImageInLayout, &l_row, &l_col, &_, &_);
     if (l_row <= m_notes.size() && l_col <= m_notes[l_row].size()) {
         qDebug() << "Clicked on image at pos " << l_row << " " << l_col << " with value " << m_notes[l_row][l_col];
         return ;
