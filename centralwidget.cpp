@@ -33,6 +33,8 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidge
 
     setObjectName(THIS_NAME);
     m_baseLayout->setObjectName(MAIN_GRID_LAYOUT_NAME);
+
+    initializeNoteOverlay();
     // At the beginning the rows are super big because they expand to take all available places
     // could add fake rows at the beginning to even things out
 }
@@ -47,12 +49,12 @@ void CentralWidget::addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget,
     // Widget is added in the first column of a new row
     while (m_lastColumns.size() <= p_row) {
         qDebug() << "Set stretch of row " << p_row;
-        m_baseLayout->setRowStretch(p_row, 1);
+        p_layout->setRowStretch(p_row, 1);
         m_lastColumns.push_back(0);
     }
     p_layout->addWidget(p_widget, p_row, m_lastColumns[p_row]);
     // This will be repeated and do nothing for each row, not sure if it is a problem
-    m_baseLayout->setColumnStretch(m_lastColumns[p_row], 1);
+    p_layout->setColumnStretch(m_lastColumns[p_row], 1);
 }
 
 void CentralWidget::placeAddImage(const int p_row)
@@ -63,8 +65,9 @@ void CentralWidget::placeAddImage(const int p_row)
 
     // When we clear the sheet display we delete all widgets on it including this one
     // So we need to recreate it
-    ClickableLabel *l_label = m_imageAdd[p_row];
+    ClickableLabel *&l_label = m_imageAdd[p_row];
     if (!l_label) {
+        qWarning() << "New QLabel created for AddImage";
         QPixmap l_addImage(ADD_IMAGE_PATH);
         l_label = new ClickableLabel(this);
         l_label->setPixmap(l_addImage);
@@ -105,31 +108,26 @@ void CentralWidget::imageClicked()
         return ;
     }
 
-    const QLayout *l_imageParentLayout = getLayoutOfParent(l_imageClicked);
-    if (l_imageParentLayout == nullptr || l_imageParentLayout != m_baseLayout)
-        return ;
-
-    const int l_indexOfImageInLayout = l_imageParentLayout->indexOf(l_imageClicked);
-    if (l_indexOfImageInLayout < 0)
-        return ;
-
-    // Unnecessary for now because we know the parent layout is m_baseLayout which is a QGridLayout *
-    // But just in case we change the type later, extra check here
-    const QGridLayout *l_gridParentLayout = qobject_cast<const QGridLayout *>(l_imageParentLayout);
-    if (l_gridParentLayout == nullptr)
-        return ;
-    // Dummy value
-    int _;
+    QGridLayout *l_parentGridLayout = nullptr;
     int l_row = -1;
     int l_col = -1;
-    l_gridParentLayout->getItemPosition(l_indexOfImageInLayout, &l_row, &l_col, &_, &_);
-    if (l_row <= m_notes.size() && l_col <= m_notes[l_row].size()) {
-        qDebug() << "Clicked on image at pos " << l_row << " " << l_col << " with value " << m_notes[l_row][l_col];
+    if (!getPosOfWidgetInGridLayout(l_imageClicked, m_baseLayout, l_row, l_col, l_parentGridLayout))
         return ;
-    }
 
-   // m_selectedRow = ;
-    // mettre une couleur ou un contour
+    /*if (!getPosOfWidgetInGridLayout(l_imageClicked, m_baseLayout, l_row, l_col))
+        return ;*/
+
+    // We could do something with QWidget::move() but this way we also benefit of the correct size and grid position
+    m_baseLayout->addWidget(&m_selectedNoteOverlay, l_row, l_col);
+
+    // When a widget is added to a layout it gets a specific index (the last one + 1 ?)
+    // When multiple widgets are overlapping the widget with the highest index is the one displayed
+    // For some reason removing the widget from the layout with removeWidget() before re-adding it does not seem to give him a new index
+    // So we need to manually raise the index of the overlay to make sure it gets displayed over the widgets that were added since the last time
+    // We could do this in "drawNoteToSheet()" to do less calls but logically it seems more obvious to do it here
+    // Anyway the raise() method starts by checking if anything needs to be done so even if we just keep on selecting images it will not do tons of operations
+    m_selectedNoteOverlay.raise();
+
     // afficher le truc de popup note
 }
 
@@ -229,9 +227,37 @@ void CentralWidget::unserializeSheet(const QJsonObject &p_jsonIn)
 void CentralWidget::deleteCurrentNotes()
 {
     m_notes.clear();
+    qWarning() << "Current notes are deleted";
 }
 
 CentralWidget::~CentralWidget()
 {
     deleteCurrentNotes();
 }
+
+/*
+ * Other solutions include :
+ * - Convert directly the selected ClickableLabel, convert its QPixmap to image and modify it
+ * - Make the QPixmap slightly smaller than the label and change the background of the label to create a border
+ */
+void CentralWidget::initializeNoteOverlay(void)
+{
+    QPixmap l_overlayPixMap(200, 200);
+    // To clarify, QT docs says about "fill()" :
+    // "The effect of this function is undefined when the pixmap is being painted on"
+    // Which looks exactly like what we are doing below
+    // But we need this to have transparent color
+    // else the 'a' parameter of the QColor used in fillRect does not do what we want
+    // Also : There is an enum Qt::transparent which seems to be the same as the one we use
+    l_overlayPixMap.fill(QColorConstants::Transparent);
+    //l_overlayPixMap.fill(QColorConstants::Red);
+    QPainter p;
+    p.begin(&l_overlayPixMap);
+    // When we do this it looks like we draw over the color of the QPixmap
+    p.fillRect(l_overlayPixMap.rect(), QColor(0, 255, 170, 120));
+    p.end();
+
+    m_selectedNoteOverlay.setPixmap(l_overlayPixMap);
+    m_selectedNoteOverlay.setScaledContents(true);
+}
+

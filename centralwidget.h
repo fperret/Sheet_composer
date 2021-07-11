@@ -41,6 +41,10 @@ private:
     // Ici on n'a pas besoin de stocker le path associe
     QVector<QVector<int> > m_notes;
     QVector<ClickableLabel *> m_imageAdd;
+    // We can use a standard pointer because the QLabel will be parented to
+    // the parent of m_baseLayout, which is this object
+    QLabel                      m_selectedNoteOverlay;
+    // Should use a smart pointer here ?
     Config *m_config;
 
     // Last current column of each row
@@ -63,6 +67,7 @@ private:
     void createSheetDisplay();
     void resizeNotesDisplay();
 
+    void initializeNoteOverlay(void);
 signals:
 
 };
