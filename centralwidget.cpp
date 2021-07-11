@@ -114,9 +114,6 @@ void CentralWidget::imageClicked()
     if (!getPosOfWidgetInGridLayout(l_imageClicked, m_baseLayout, l_row, l_col, l_parentGridLayout))
         return ;
 
-    /*if (!getPosOfWidgetInGridLayout(l_imageClicked, m_baseLayout, l_row, l_col))
-        return ;*/
-
     // We could do something with QWidget::move() but this way we also benefit of the correct size and grid position
     m_baseLayout->addWidget(&m_selectedNoteOverlay, l_row, l_col);
 

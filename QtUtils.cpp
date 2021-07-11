@@ -33,7 +33,9 @@ QLayout *getLayoutOfParent(const QWidget *p_widget)
 }
 
 /*
- * @p_widgetRow, @p_widgetCol, @p_parentLayoutFound are only set if this function returns true
+ * @p_widgetRow, @p_widgetCol, @p_parentLayoutFound are only set if this function returns true.
+ * @p_expectedParentLayout is a weird parameter because we basically give the parent layout and then we expect to get the parent layout in @p_parentLayoutFound
+ * But it does not cost much as an extra security check while we are not confident on the global architecture of the layouts and widgets.
  *
  * @p_widget                [in] Cannot be defined const because of QLayout::indexOf()
  * @p_expectedParentLayout  [in] If != nullptr, will be compared to the found parent layout to help make sure @p_widget is parented the way we think
@@ -81,6 +83,7 @@ bool getPosOfWidgetInGridLayout(QWidget *p_widget, const QGridLayout *p_expected
 }
 
 /*
+ * Overload of getPosOfWidgetInGridLayout when we do not need the parent's layout that has been found.
  * @p_widgetRow, @p_widgetCol are only set if this function returns true
  *
  * @p_widget                [in] Cannot be defined const because of QLayout::indexOf()
@@ -91,12 +94,13 @@ bool getPosOfWidgetInGridLayout(QWidget *p_widget, const QGridLayout *p_expected
  */
 bool getPosOfWidgetInGridLayout(QWidget *p_widget, const QGridLayout *p_expectedParentLayout, int &p_widgetRow, int &p_widgetCol)
 {
-     // Test if this is possible
-    QGridLayout *l_parentLayoutFound = nullptr;
-    return getPosOfWidgetInGridLayout(p_widget, p_expectedParentLayout, p_widgetRow, p_widgetCol, l_parentLayoutFound);
+    // Dummy value
+    QGridLayout *_ = nullptr;
+    return getPosOfWidgetInGridLayout(p_widget, p_expectedParentLayout, p_widgetRow, p_widgetCol, _);
 }
 
 /*
+ * Overload of getPosOfWidgetInGridLayout when we do not know the expected parent and we do not get its pointer.
  * @p_widgetRow, @p_widgetCol, are only set if this function returns true
  *
  * @p_widget                [in] Cannot be defined const because of QLayout::indexOf()
@@ -104,13 +108,15 @@ bool getPosOfWidgetInGridLayout(QWidget *p_widget, const QGridLayout *p_expected
  * @p_widgetCol             [out] Col of @p_widget in its parent's QGridLayout
  * @return  False if any of the step to get @p_widgetRow and @p_widgetCol failed, else true
  */
-/*bool getPosOfWidgetInGridLayout(QWidget *p_widget, int &p_widgetRow, int &p_widgetCol)
+bool getPosOfWidgetInGridLayout(QWidget *p_widget, int &p_widgetRow, int &p_widgetCol)
 {
-     // Test if this is possible
-    return getPosOfWidgetInGridLayout(p_widget, nullptr, p_widgetRow, p_widgetCol, nullptr);
-}*/
+     // Dummy value
+    QGridLayout *_ = nullptr;
+    return getPosOfWidgetInGridLayout(p_widget, nullptr, p_widgetRow, p_widgetCol, _);
+}
 
 /*
+ * Overload of getPosOfWidgetInGridLayout when we do not know the expected parent but want to get its pointer.
  * @p_widgetRow, @p_widgetCol, @p_parentLayoutFound are only set if this function returns true
  *
  * @p_widget                [in] Cannot be defined const because of QLayout::indexOf()
@@ -119,7 +125,7 @@ bool getPosOfWidgetInGridLayout(QWidget *p_widget, const QGridLayout *p_expected
  * @p_parentLayoutFound     [out] @p_wdiget Parent's QGridLayout found, set for convenience
  * @return  False if any of the step to get @p_widgetRow and @p_widgetCol failed, else true
  */
-/*bool getPosOfWidgetInGridLayout(QWidget *p_widget, int &p_widgetRow, int &p_widgetCol, QGridLayout *p_parentLayoutFound)
+bool getPosOfWidgetInGridLayout(QWidget *p_widget, int &p_widgetRow, int &p_widgetCol, QGridLayout *&p_parentLayoutFound)
 {
     return getPosOfWidgetInGridLayout(p_widget, nullptr, p_widgetRow, p_widgetCol, p_parentLayoutFound);
-}*/
+}
