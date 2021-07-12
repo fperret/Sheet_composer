@@ -26,6 +26,7 @@ public Q_SLOTS:
     void editSettings();
 
     void sheetSaveAs();
+    void deleteSelectedSheetNote();
 
 Q_SIGNALS:
     void resizeNeeded(void);

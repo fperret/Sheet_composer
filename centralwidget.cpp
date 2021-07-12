@@ -19,13 +19,10 @@
 
 class MainWindow;
 
-CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) : QWidget(parent)
+CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) :
+    QWidget(parent), m_baseLayout(new QGridLayout(this)), m_selectedNoteWidget(nullptr), m_config(&p_mainWindow->m_config), m_selectedRow(0)
 {
     connect(p_mainWindow, &MainWindow::resizeNeeded, this, &CentralWidget::resizeNotesDisplay);
-    m_config = &p_mainWindow->m_config;
-    m_baseLayout = new QGridLayout(this);
-
-    m_selectedRow = 0;
 
     m_baseLayout->setSpacing(1);
 
@@ -108,14 +105,16 @@ void CentralWidget::imageClicked()
         return ;
     }
 
-    QGridLayout *l_parentGridLayout = nullptr;
     int l_row = -1;
     int l_col = -1;
-    if (!getPosOfWidgetInGridLayout(l_imageClicked, m_baseLayout, l_row, l_col, l_parentGridLayout))
+    if (!getPosOfWidgetInGridLayout(l_imageClicked, m_baseLayout, l_row, l_col))
         return ;
 
     // We could do something with QWidget::move() but this way we also benefit of the correct size and grid position
+    m_posOfSelectedNote.row = l_row;
+    m_posOfSelectedNote.column = l_col;
     m_baseLayout->addWidget(&m_selectedNoteOverlay, l_row, l_col);
+    m_selectedNoteWidget = l_imageClicked;
 
     // When a widget is added to a layout it gets a specific index (the last one + 1 ?)
     // When multiple widgets are overlapping the widget with the highest index is the one displayed
@@ -126,6 +125,37 @@ void CentralWidget::imageClicked()
     m_selectedNoteOverlay.raise();
 
     // afficher le truc de popup note
+}
+
+void CentralWidget::deleteSelectedSheetNote()
+{
+    // Determine if we have a selected note
+    if (m_selectedNoteWidget == nullptr) {
+        qWarning() << "Trying to delete sheet note but none selected";
+        return ;
+    }
+    if (m_selectedNoteOverlay.parent() == nullptr || m_posOfSelectedNote.isUnitialized()) {
+        qDebug() << "Extra data needed to delete sheet note not correctly set";
+        return ;
+    }
+
+    if (m_posOfSelectedNote.row != -1 && m_posOfSelectedNote.row <= m_notes.size()
+    && m_posOfSelectedNote.column != -1 && m_posOfSelectedNote.column <= m_notes[m_posOfSelectedNote.row].size()) {
+        // Would it be better to only modify m_notes and then "reload" the display ?
+        // To separate the data side and the GUI side
+
+        // "Remove" the note from the data
+        m_notes[m_posOfSelectedNote.row][m_posOfSelectedNote.column] = -1;
+        // Remove the widget
+        m_baseLayout->removeWidget(m_selectedNoteWidget);
+        delete m_selectedNoteWidget;
+        m_selectedNoteWidget = nullptr;
+        // Remove the overlay
+        m_baseLayout->removeWidget(&m_selectedNoteOverlay);
+        m_selectedNoteOverlay.setParent(nullptr);
+        // Reset the position
+        m_posOfSelectedNote.reset();
+    }
 }
 
 void CentralWidget::changeNoteValue()
@@ -256,5 +286,6 @@ void CentralWidget::initializeNoteOverlay(void)
 
     m_selectedNoteOverlay.setPixmap(l_overlayPixMap);
     m_selectedNoteOverlay.setScaledContents(true);
+    m_selectedNoteOverlay.setParent(nullptr);
 }
 

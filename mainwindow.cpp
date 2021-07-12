@@ -56,6 +56,15 @@ void MainWindow::createToolBar()
         m_config.decreaseSheetNoteHeight();
         emit resizeNeeded();
     });
+
+    const QIcon l_deleteSheetNoteIcon = QIcon(":/images/delete-sheet-note.png");
+    QAction *l_deleteSheetNoteAction = new QAction(l_deleteSheetNoteIcon, tr("Delete"), this);
+    l_deleteSheetNoteAction->setShortcut(Qt::Key_Delete);
+    l_fileToolBar->addAction(l_deleteSheetNoteAction);
+    // We cannot connect directly to our CentralWidget objet because it does not exists yet
+    // Maybe we should hold a pointer to it
+    l_deleteSheetNoteAction->connect(l_deleteSheetNoteAction, &QAction::triggered, this, &MainWindow::deleteSelectedSheetNote);
+
 }
 
 void MainWindow::saveSheet() const
@@ -71,6 +80,11 @@ void MainWindow::sheetSaveAs()
         m_currentSheetPath = l_selectFile;
         saveSheet();
     }
+}
+
+void MainWindow::deleteSelectedSheetNote()
+{
+    qobject_cast<CentralWidget *>(centralWidget())->deleteSelectedSheetNote();
 }
 
 void MainWindow::openSheet()
