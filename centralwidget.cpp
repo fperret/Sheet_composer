@@ -23,6 +23,7 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) :
     QWidget(parent), m_baseLayout(new QGridLayout(this)), m_selectedNoteWidget(nullptr), m_config(&p_mainWindow->m_config), m_selectedRow(0)
 {
     connect(p_mainWindow, &MainWindow::resizeNeeded, this, &CentralWidget::resizeNotesDisplay);
+    connect(this, &CentralWidget::sheetNoteSelectedChange, p_mainWindow, &MainWindow::sheetNoteSelectedChanged);
 
     m_baseLayout->setSpacing(1);
 
@@ -124,6 +125,7 @@ void CentralWidget::imageClicked()
     // Anyway the raise() method starts by checking if anything needs to be done so even if we just keep on selecting images it will not do tons of operations
     m_selectedNoteOverlay.raise();
 
+    emit sheetNoteSelectedChange(true);
     // afficher le truc de popup note
 }
 
@@ -155,6 +157,8 @@ void CentralWidget::deleteSelectedSheetNote()
         m_selectedNoteOverlay.setParent(nullptr);
         // Reset the position
         m_posOfSelectedNote.reset();
+        // Notify
+        emit sheetNoteSelectedChange(false);
     }
 }
 

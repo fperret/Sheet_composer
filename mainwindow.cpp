@@ -10,6 +10,9 @@
 #include "lineedit.h"
 #include "centralwidget.h"
 
+using namespace toolbar;
+
+// ?
 void MainWindow::addNewNote()
 {
     QAction *l_caller = qobject_cast<QAction *>(sender());
@@ -21,49 +24,56 @@ void MainWindow::addNewNote()
 void MainWindow::createToolBar()
 {
     // toolbar is a line below the menuBar with icons
-    QToolBar *l_fileToolBar = addToolBar(("File"));
+    m_toolBar = addToolBar(("File"));
 
-    l_fileToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    m_toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     const QIcon l_expandWidthIcon = QIcon(":/images/expand-width.png");
     QAction *l_expandWidthAction = new QAction(l_expandWidthIcon, tr("Expand width"), this);
-    l_fileToolBar->addAction(l_expandWidthAction);
+    m_toolBar->addAction(l_expandWidthAction);
     connect(l_expandWidthAction, &QAction::triggered, this, [this]() {
         m_config.increaseSheetNoteWidth();
         emit resizeNeeded();
     });
+    m_toolBarActions.insert(ToolBarAction::EXPAND_WIDTH, l_expandWidthAction);
 
     const QIcon l_reduceWidthIcon = QIcon(":/images/reduce-width.png");
     QAction *l_reduceWidthAction = new QAction(l_reduceWidthIcon, tr("Reduce width"), this);
-    l_fileToolBar->addAction(l_reduceWidthAction);
+    m_toolBar->addAction(l_reduceWidthAction);
     connect(l_reduceWidthAction, &QAction::triggered, this, [this]() {
         m_config.decreaseSheetNoteWidth();
         emit resizeNeeded();
     });
+    m_toolBarActions.insert(ToolBarAction::REDUCE_WIDTH, l_reduceWidthAction);
 
     const QIcon l_expandHeightIcon = QIcon(":/images/expand-height.png");
     QAction *l_expandHeightAction = new QAction(l_expandHeightIcon, tr("Expand height"), this);
-    l_fileToolBar->addAction(l_expandHeightAction);
+    m_toolBar->addAction(l_expandHeightAction);
     connect(l_expandHeightAction, &QAction::triggered, this, [this]() {
         m_config.increaseSheetNoteHeight();
         emit resizeNeeded();
     });
+    m_toolBarActions.insert(ToolBarAction::EXPAND_HEIGHT, l_expandHeightAction);
 
     const QIcon l_reduceHeightIcon = QIcon(":/images/reduce-height.png");
     QAction *l_reduceHeightAction = new QAction(l_reduceHeightIcon, tr("Reduce height"), this);
-    l_fileToolBar->addAction(l_reduceHeightAction);
+    m_toolBar->addAction(l_reduceHeightAction);
     connect(l_reduceHeightAction, &QAction::triggered, this, [this]() {
         m_config.decreaseSheetNoteHeight();
         emit resizeNeeded();
     });
+    m_toolBarActions.insert(ToolBarAction::REDUCE_HEIGHT, l_reduceHeightAction);
 
     const QIcon l_deleteSheetNoteIcon = QIcon(":/images/delete-sheet-note.png");
     QAction *l_deleteSheetNoteAction = new QAction(l_deleteSheetNoteIcon, tr("Delete"), this);
     l_deleteSheetNoteAction->setShortcut(Qt::Key_Delete);
-    l_fileToolBar->addAction(l_deleteSheetNoteAction);
+    l_deleteSheetNoteAction->setDisabled(true);
+    m_toolBar->addAction(l_deleteSheetNoteAction);
     // We cannot connect directly to our CentralWidget objet because it does not exists yet
     // Maybe we should hold a pointer to it
     l_deleteSheetNoteAction->connect(l_deleteSheetNoteAction, &QAction::triggered, this, &MainWindow::deleteSelectedSheetNote);
+    m_toolBarActions.insert(ToolBarAction::DELETE_SHEET_NOTE, l_deleteSheetNoteAction);
+
 
 }
 
@@ -153,7 +163,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_config(this),
       ui(new Ui::MainWindow),
-      m_currentSheetPath("../toto.json")
+      m_currentSheetPath("../toto.json"),
+      m_toolBar(nullptr)
 {
     ui->setupUi(this);
 
@@ -230,4 +241,15 @@ void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
 void MainWindow::editSettings()
 {
 
+}
+
+void MainWindow::sheetNoteSelectedChanged(const bool p_selected)
+{
+    if (m_toolBar == nullptr)
+        return ;
+
+    QAction *l_deleteSheetNoteAction = m_toolBarActions.value(ToolBarAction::DELETE_SHEET_NOTE, nullptr);
+    if (l_deleteSheetNoteAction != nullptr) {
+        l_deleteSheetNoteAction->setDisabled(!p_selected);
+    }
 }

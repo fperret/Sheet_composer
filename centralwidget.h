@@ -42,6 +42,9 @@ public Q_SLOTS:
     void addNotePopup();
     void deleteSelectedSheetNote();
 
+Q_SIGNALS:
+    void sheetNoteSelectedChange(const bool p_selected);
+
 private:
     // Path to the "add note" button's imagee
     const QString ADD_IMAGE_PATH = ":/images/plus_sign.png";

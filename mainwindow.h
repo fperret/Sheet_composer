@@ -8,6 +8,21 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+namespace toolbar {
+enum class ToolBarAction {
+    EXPAND_WIDTH = 0,
+    REDUCE_WIDTH,
+    EXPAND_HEIGHT,
+    REDUCE_HEIGHT,
+    DELETE_SHEET_NOTE,
+};
+
+inline uint qHash(ToolBarAction p_key, uint p_seed)
+{
+    return ::qHash(static_cast<uint>(p_key), p_seed);
+}
+}
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -17,6 +32,7 @@ public:
     ~MainWindow();
 
     Config m_config;
+    void sheetNoteSelectedChanged(const bool p_selected);
 
 public Q_SLOTS:
     void addNewNote();
@@ -34,6 +50,9 @@ Q_SIGNALS:
 private:
     Ui::MainWindow *ui;
     QString m_currentSheetPath;
+    // For now we only have one toolBar and it's created at the beginning
+    QToolBar *m_toolBar;
+    QHash<toolbar::ToolBarAction, QAction *> m_toolBarActions;
 
     void createToolBar();
     void saveCurrentInstrument(void) const;
