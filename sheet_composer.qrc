@@ -14,5 +14,6 @@
         <file>images/expand-width.png</file>
         <file>images/reduce-height.png</file>
         <file>images/reduce-width.png</file>
+        <file>images/delete-sheet-note.png</file>
     </qresource>
 </RCC>

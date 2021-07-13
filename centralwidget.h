@@ -12,6 +12,18 @@
 #include "config.h"
 #include "mainwindow.h"
 
+struct GridPos {
+
+    GridPos() { reset(); }
+    GridPos(const int p_row, const int p_col) : row(p_row), column(p_col) {}
+
+    bool isUnitialized(void) const { return row == -1 && column == -1; }
+    void reset(void) { row = -1; column = -1; }
+
+    int row;
+    int column;
+};
+
 class CentralWidget : public QWidget
 {
     Q_OBJECT
@@ -28,6 +40,10 @@ public Q_SLOTS:
     void imageClicked();
     void popupNoteClicked();
     void addNotePopup();
+    void deleteSelectedSheetNote();
+
+Q_SIGNALS:
+    void sheetNoteSelectedChange(const bool p_selected);
 
 private:
     // Path to the "add note" button's imagee
@@ -37,13 +53,14 @@ private:
     const QString THIS_NAME             = "CentralWidget";
 
     QGridLayout *m_baseLayout;
-    // Est ce qu'on a besoin d'avoir les notes ici et celles dans config ?
-    // Ici on n'a pas besoin de stocker le path associe
+    // Source de confusion : Les notes ici sont celles affichees sur la partition
+    // Les notes dans Config sont les notes "utilisables"
     QVector<QVector<int> > m_notes;
     QVector<ClickableLabel *> m_imageAdd;
-    // We can use a standard pointer because the QLabel will be parented to
-    // the parent of m_baseLayout, which is this object
+
     QLabel                      m_selectedNoteOverlay;
+    GridPos                     m_posOfSelectedNote;
+    QWidget                     *m_selectedNoteWidget;
     // Should use a smart pointer here ?
     Config *m_config;
 
