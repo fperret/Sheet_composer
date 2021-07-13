@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "config.h"
+#include "editpanel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -53,6 +54,7 @@ private:
     // For now we only have one toolBar and it's created at the beginning
     QToolBar *m_toolBar;
     QHash<toolbar::ToolBarAction, QAction *> m_toolBarActions;
+    EditPanel   *m_editPanel;
 
     void createToolBar();
     void saveCurrentInstrument(void) const;

@@ -20,6 +20,7 @@ SOURCES += \
     centralwidget.cpp \
     clickablelabel.cpp \
     config.cpp \
+    editpanel.cpp \
     jsonUtility.cpp \
     lineedit.cpp \
     main.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     centralwidget.h \
     clickablelabel.h \
     config.h \
+    editpanel.h \
     lineedit.h \
     mainwindow.h
 

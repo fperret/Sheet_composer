@@ -164,11 +164,15 @@ MainWindow::MainWindow(QWidget *parent)
       m_config(this),
       ui(new Ui::MainWindow),
       m_currentSheetPath("../toto.json"),
-      m_toolBar(nullptr)
+      m_toolBar(nullptr),
+      m_editPanel(nullptr)
 {
     ui->setupUi(this);
 
     createToolBar();
+
+    m_editPanel = new EditPanel(this, &m_config);
+    addDockWidget(Qt::RightDockWidgetArea, m_editPanel);
 
     // & in front of the string creates a keyboard shortcut linked to the first letter
     // menuBar is the menu at the very top of the window
