@@ -168,6 +168,7 @@ MainWindow::MainWindow(QWidget *parent)
       m_editPanel(nullptr)
 {
     ui->setupUi(this);
+    resize(1500, 1000);
 
     createToolBar();
 
@@ -204,6 +205,7 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->addAction(l_settingsAction);
 
     loadNotesForInstrument("../instruments.json");
+    m_editPanel->initialize(EditPanelAccessKey());
 }
 
 MainWindow::~MainWindow()

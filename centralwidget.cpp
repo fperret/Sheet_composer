@@ -35,6 +35,7 @@ CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) :
     initializeNoteOverlay();
     // At the beginning the rows are super big because they expand to take all available places
     // could add fake rows at the beginning to even things out
+
 }
 
 void CentralWidget::setConfig(Config *p_config)

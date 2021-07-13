@@ -24,6 +24,8 @@ inline uint qHash(ToolBarAction p_key, uint p_seed)
 }
 }
 
+class EditPanel;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
