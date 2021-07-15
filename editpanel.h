@@ -9,7 +9,9 @@
 #include <QScrollArea>
 
 #include "config.h"
-#include "mainwindow.h"
+
+class MainWindow;
+class CentralWidget;
 
 // This is used to restrain access of some functions (initialize()) of EditPanel to only some classes (MainWindow)
 class EditPanelAccessKey {
@@ -23,7 +25,7 @@ class EditPanel : public QDockWidget
     Q_OBJECT
 public:
 
-    EditPanel(QWidget *parent, Config *p_config);
+    EditPanel(QWidget *parent, Config *p_config, const CentralWidget *p_centralWidget);
     ~EditPanel();
     explicit EditPanel(QWidget *parent = nullptr);
 
@@ -35,8 +37,8 @@ signals:
 
 private:
     const size_t NOTE_CHOICES_MAX_COLUMNS = 2;
-    static const QString m_title;
 
+    const CentralWidget    *m_centralWidget;
     Config *m_config;
     QScrollArea *m_scrollArea;
     // If this is not a pointer program crash when a Widget added to it goes out of scope

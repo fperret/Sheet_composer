@@ -10,7 +10,8 @@
 
 #include "clickablelabel.h"
 #include "config.h"
-#include "mainwindow.h"
+
+class MainWindow;
 
 struct GridPos {
 

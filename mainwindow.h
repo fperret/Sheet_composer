@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "config.h"
 #include "editpanel.h"
+#include "centralwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,8 +24,6 @@ inline uint qHash(ToolBarAction p_key, uint p_seed)
     return ::qHash(static_cast<uint>(p_key), p_seed);
 }
 }
-
-class EditPanel;
 
 class MainWindow : public QMainWindow
 {
@@ -56,7 +55,8 @@ private:
     // For now we only have one toolBar and it's created at the beginning
     QToolBar *m_toolBar;
     QHash<toolbar::ToolBarAction, QAction *> m_toolBarActions;
-    EditPanel   *m_editPanel;
+    CentralWidget   m_centralWidget;
+    EditPanel       m_editPanel;
 
     void createToolBar();
     void saveCurrentInstrument(void) const;

@@ -8,6 +8,7 @@
 
 #include "Utility.h"
 #include "lineedit.h"
+
 #include "centralwidget.h"
 
 using namespace toolbar;
@@ -165,15 +166,16 @@ MainWindow::MainWindow(QWidget *parent)
       ui(new Ui::MainWindow),
       m_currentSheetPath("../toto.json"),
       m_toolBar(nullptr),
-      m_editPanel(nullptr)
+      m_centralWidget(this),
+      m_editPanel(this, &m_config, &m_centralWidget)
 {
     ui->setupUi(this);
     resize(1500, 1000);
+    setCentralWidget(&m_centralWidget);
 
     createToolBar();
 
-    m_editPanel = new EditPanel(this, &m_config);
-    addDockWidget(Qt::RightDockWidgetArea, m_editPanel);
+    addDockWidget(Qt::RightDockWidgetArea, &m_editPanel);
 
     // & in front of the string creates a keyboard shortcut linked to the first letter
     // menuBar is the menu at the very top of the window
@@ -205,7 +207,7 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->addAction(l_settingsAction);
 
     loadNotesForInstrument("../instruments.json");
-    m_editPanel->initialize(EditPanelAccessKey());
+    m_editPanel.initialize(EditPanelAccessKey());
 }
 
 MainWindow::~MainWindow()

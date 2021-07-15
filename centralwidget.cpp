@@ -16,8 +16,7 @@
 
 #include "clickablelabel.h"
 #include "QtUtils.h"
-
-class MainWindow;
+#include "mainwindow.h"
 
 CentralWidget::CentralWidget(MainWindow *p_mainWindow, QWidget *parent) :
     QWidget(parent), m_baseLayout(new QGridLayout(this)), m_selectedNoteWidget(nullptr), m_config(&p_mainWindow->m_config), m_selectedRow(0)
