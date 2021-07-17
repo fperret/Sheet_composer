@@ -17,6 +17,7 @@ public:
 
     void setInstruments(const QVector<QString> &p_instruments);
     void setNotes(const QMap<int, QString> &p_notes);
+    void setNotes(QMap<int, QString> &&p_notes);
 
     const QVector<QString> &getInstruments(void) const;
     const QMap<int, QString> &getNotes(void) const;
@@ -39,10 +40,11 @@ public Q_SLOTS:
     void increaseSheetNoteHeight();
     void decreaseSheetNoteHeight();
 
+Q_SIGNALS:
+    void configNotesChanged(void);
 
 private:
     QVector<QString> m_instruments;
-    // Note : value of note could be a string
     // All possible notes available
     // Each key in a row is the value of the note, the value is the path to the image
     QMap<int, QString> m_notes;

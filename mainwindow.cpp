@@ -167,11 +167,13 @@ MainWindow::MainWindow(QWidget *parent)
       m_currentSheetPath("../toto.json"),
       m_toolBar(nullptr),
       m_centralWidget(this),
-      m_editPanel(this, &m_config, &m_centralWidget)
+      m_editPanel(this, &m_config,  &m_centralWidget)
 {
     ui->setupUi(this);
     resize(1500, 1000);
     setCentralWidget(&m_centralWidget);
+
+    connect(&m_config, &Config::configNotesChanged, this, &MainWindow::configNoteChangeCallback);
 
     createToolBar();
 
@@ -207,7 +209,8 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->addAction(l_settingsAction);
 
     loadNotesForInstrument("../instruments.json");
-    m_editPanel.initialize(EditPanelAccessKey());
+
+    m_editPanel.setHidden(true);
 }
 
 MainWindow::~MainWindow()
@@ -230,6 +233,7 @@ void MainWindow::saveCurrentInstrument(void) const
 
 void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
 {
+    qDebug() << "MainWindow::loadNotesForInstrument";
     QJsonObject l_root = loadJsonObjectFromFile(p_instrumentPath);
     if (l_root.isEmpty()) {
         qWarning("Failed to load instrument json");
@@ -243,7 +247,7 @@ void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
         l_notes[l_jsonKey.toUInt()] = l_jsonNotes.value(l_jsonKey).toString();
     }
     qDebug() << "Loaded notes : " << l_notes;
-    m_config.setNotes(l_notes);
+    m_config.setNotes(std::move(l_notes));
 }
 
 void MainWindow::editSettings()
@@ -260,4 +264,11 @@ void MainWindow::sheetNoteSelectedChanged(const bool p_selected)
     if (l_deleteSheetNoteAction != nullptr) {
         l_deleteSheetNoteAction->setDisabled(!p_selected);
     }
+    m_editPanel.setHidden(!p_selected);
 }
+
+void MainWindow::configNoteChangeCallback(void)
+{
+    m_editPanel.initialize(EditPanelAccessKey());
+}
+

@@ -46,7 +46,6 @@ void CentralWidget::addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget,
 {
     // Widget is added in the first column of a new row
     while (m_lastColumns.size() <= p_row) {
-        qDebug() << "Set stretch of row " << p_row;
         p_layout->setRowStretch(p_row, 1);
         m_lastColumns.push_back(0);
     }

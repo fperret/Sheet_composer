@@ -45,6 +45,7 @@ public Q_SLOTS:
 
     void sheetSaveAs();
     void deleteSelectedSheetNote();
+    void configNoteChangeCallback(void);
 
 Q_SIGNALS:
     void resizeNeeded(void);
@@ -56,6 +57,7 @@ private:
     QToolBar *m_toolBar;
     QHash<toolbar::ToolBarAction, QAction *> m_toolBarActions;
     CentralWidget   m_centralWidget;
+    // Don't forget to update (re initialize ?) panel when new config note is created
     EditPanel       m_editPanel;
 
     void createToolBar();

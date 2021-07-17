@@ -9,7 +9,6 @@ Config::~Config()
 {
 }
 
-// Note : value of note could be a string
 bool Config::addNote(const QString &p_notePath)
 {
     QList<int> l_keys = m_notes.keys();
@@ -36,13 +35,16 @@ bool Config::addNote(const QString &p_notePath)
 /*
  * Will override existing value
  */
-// Note : value of note could be a string
+// Note : value of note (the key) could be a string
 void Config::addNote(const int &p_value, const QString &p_notePath)
 {
-    m_notes[p_value] = p_notePath;
-    qDebug() << "Notes : " << m_notes;
+    auto l_it = m_notes.find(p_value);
+    if ((l_it == m_notes.end())
+    || (l_it != m_notes.end() && l_it.value() == p_notePath)) {
+        m_notes[p_value] = p_notePath;
+        emit configNotesChanged();
+    }
 }
-
 
 void Config::setInstruments(const QVector<QString> &p_instruments)
 {
@@ -51,7 +53,18 @@ void Config::setInstruments(const QVector<QString> &p_instruments)
 
 void Config::setNotes(const QMap<int, QString> &p_notes)
 {
-    m_notes = p_notes;
+    if (m_notes != p_notes) {
+        m_notes = p_notes;
+        emit configNotesChanged();
+    }
+}
+
+void Config::setNotes(QMap<int, QString> &&p_notes)
+{
+    if (m_notes != p_notes) {
+        m_notes = p_notes;
+        emit configNotesChanged();
+    }
 }
 
 const QVector<QString> &Config::getInstruments(void) const

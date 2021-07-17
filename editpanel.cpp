@@ -4,6 +4,7 @@
 
 #include "mainwindow.h"
 #include "centralwidget.h"
+#include "QtUtils.h"
 
 namespace {
 
@@ -12,11 +13,18 @@ const QString EDIT_PANEL_TITLE = "Edit Note";
 }
 
 
-EditPanel::EditPanel(QWidget *parent, Config *p_config, const CentralWidget *p_centralWidget) : QDockWidget(EDIT_PANEL_TITLE, parent), m_centralWidget(p_centralWidget), m_config(p_config), m_scrollArea(new QScrollArea(this)), m_editNotesLayout(new QGridLayout(m_scrollArea))
+EditPanel::EditPanel(QWidget *parent, Config *p_config, const CentralWidget *p_centralWidget) :
+    QDockWidget(EDIT_PANEL_TITLE, parent),
+    m_centralWidget(p_centralWidget),
+    m_config(p_config),
+    m_scrollArea(new QScrollArea(this)),
+    m_scrollWidget(new QWidget(this)),
+    m_editNotesLayout(new QGridLayout(m_scrollArea))
 {
     setWidget(m_scrollArea);
     // TODO : dynamic size depending on image size
     m_scrollArea->setMinimumWidth(250);
+    m_editNotesLayout->setSpacing(3);
 }
 
 EditPanel::~EditPanel()
@@ -25,14 +33,14 @@ EditPanel::~EditPanel()
 
 void EditPanel::initialize(EditPanelAccessKey)
 {
+    qDebug() << Q_FUNC_INFO;
     // need to factorize this with CentralWidget::addNotePopup()
     const QMap<int, QString> &l_configNotes = m_config->getNotes();
 
-    m_editNotesLayout->setSpacing(3);
+    deleteWidgetsFromLayout(m_editNotesLayout);
 
     size_t l_row = 0;
     size_t l_column = 0;
-    for (int i = 0 ; i < 4; i++) {
     for (auto l_noteVal : l_configNotes.keys()) {
         if (l_configNotes.value(l_noteVal).isEmpty())
             continue;
@@ -54,12 +62,10 @@ void EditPanel::initialize(EditPanelAccessKey)
             l_row++;
         }
     }
-    }
 
     // QScrollArea uses its own layout so we need to wrap our QGridLayout in a QWidget
-    QWidget *l_scrollWidget = new QWidget(this);
-    l_scrollWidget->setLayout(m_editNotesLayout);
+    m_scrollWidget->setLayout(m_editNotesLayout);
     // From QT docs :
     // Note that You must add the layout of the parameter before you call this function; if you add it later, the widget will not be visible
-    m_scrollArea->setWidget(l_scrollWidget);
+    m_scrollArea->setWidget(m_scrollWidget);
 }

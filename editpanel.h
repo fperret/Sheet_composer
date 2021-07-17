@@ -41,6 +41,8 @@ private:
     const CentralWidget    *m_centralWidget;
     Config *m_config;
     QScrollArea *m_scrollArea;
+    // QScrollArea uses its own layout so we need to wrap our QGridLayout in a QWidget
+    QWidget     *m_scrollWidget;
     // If this is not a pointer program crash when a Widget added to it goes out of scope
     QGridLayout *m_editNotesLayout;
 
