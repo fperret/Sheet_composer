@@ -95,7 +95,7 @@ void MainWindow::sheetSaveAs()
 
 void MainWindow::deleteSelectedSheetNote()
 {
-    qobject_cast<CentralWidget *>(centralWidget())->deleteSelectedSheetNote();
+    qobject_cast<CentralWidget *>(centralWidget())->deleteSelectedSheetNote(false);
 }
 
 void MainWindow::openSheet()

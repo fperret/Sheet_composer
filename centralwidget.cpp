@@ -112,18 +112,6 @@ void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
     //connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
 }
 
-
-void CentralWidget::replaceNoteOnSheet(const uint &p_noteVal, const int p_row, const int p_col)
-{
-    ClickableLabel *l_imageLabel = createNoteForSheet(p_noteVal);
-
-    // need to get and remove the widget
-    // this might not be generic enough
-    deleteSelectedSheetNote();
-
-    m_baseLayout->addWidget(l_imageLabel, p_row, p_col);
-}
-
 void CentralWidget::imageClicked()
 {
     // We probably do not need to do all that to get the layout because there is a 99% chance
@@ -158,7 +146,8 @@ void CentralWidget::imageClicked()
 }
 
 
-void CentralWidget::deleteSelectedSheetNote()
+// factorize the condition at beginning with isSelectedPosNoteValid
+void CentralWidget::deleteSelectedSheetNote(const bool p_keepSelectionOverlay)
 {
     // Determine if we have a selected note
     if (m_selectedNoteWidget == nullptr) {
@@ -181,13 +170,16 @@ void CentralWidget::deleteSelectedSheetNote()
         m_baseLayout->removeWidget(m_selectedNoteWidget);
         delete m_selectedNoteWidget;
         m_selectedNoteWidget = nullptr;
-        // Remove the overlay
-        m_baseLayout->removeWidget(&m_selectedNoteOverlay);
-        m_selectedNoteOverlay.setParent(nullptr);
-        // Reset the position
-        m_posOfSelectedNote.reset();
-        // Notify
-        emit sheetNoteSelectedChange(false);
+
+        if (!p_keepSelectionOverlay) {
+            // Remove the overlay
+            m_baseLayout->removeWidget(&m_selectedNoteOverlay);
+            m_selectedNoteOverlay.setParent(nullptr);
+            // Reset the position
+            m_posOfSelectedNote.reset();
+            // Notify
+            emit sheetNoteSelectedChange(false);
+        }
     }
 }
 

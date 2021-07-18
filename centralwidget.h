@@ -36,13 +36,13 @@ public:
     QJsonObject serializeSheet(void) const;
 
     void setConfig(Config *p_config);
+    void deleteSelectedSheetNote(const bool p_keepSelectionOverlay);
 
 public Q_SLOTS:
     void imageClicked();
     void popupNoteClicked();
     void editNoteClicked();
     void addNotePopup();
-    void deleteSelectedSheetNote();
 
 Q_SIGNALS:
     void sheetNoteSelectedChange(const bool p_selected);
@@ -77,7 +77,6 @@ private:
     void deleteCurrentNotes();
     ClickableLabel *createNoteForSheet(const uint &p_noteVal);
     void drawNoteToSheet(const uint &p_noteVal, const int p_row);
-    void replaceNoteOnSheet(const uint &p_noteVal, const int p_row, const int p_col);
 
     void addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget, const int p_row);
     void placeAddImage(const int p_row);

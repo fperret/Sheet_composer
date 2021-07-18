@@ -47,10 +47,13 @@ void CentralWidget::editNoteClicked()
 {
     int l_val = sender()->property("value").value<int>();
     if (isSelectedNoteValid()) {
+        deleteSelectedSheetNote(true);
         m_notes[m_posOfSelectedNote.row][m_posOfSelectedNote.column] = l_val;
-        replaceNoteOnSheet(l_val, m_posOfSelectedNote.row, m_posOfSelectedNote.column);
+        ClickableLabel *l_imageLabel = createNoteForSheet(l_val);
+        m_baseLayout->addWidget(l_imageLabel, m_posOfSelectedNote.row, m_posOfSelectedNote.column);
+        m_selectedNoteWidget = l_imageLabel;
+        m_selectedNoteOverlay.raise();
     }
-
     // If we allow the "addImage" to be selected we will need to recreate one here
 }
 
