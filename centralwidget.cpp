@@ -64,7 +64,6 @@ void CentralWidget::placeAddImage(const int p_row)
     // So we need to recreate it
     ClickableLabel *&l_label = m_imageAdd[p_row];
     if (!l_label) {
-        qWarning() << "New QLabel created for AddImage";
         QPixmap l_addImage(ADD_IMAGE_PATH);
         l_label = new ClickableLabel(this);
         l_label->setPixmap(l_addImage);
@@ -75,7 +74,7 @@ void CentralWidget::placeAddImage(const int p_row)
     addWidgetInLastCol(m_baseLayout, l_label, p_row);
 }
 
-void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
+ClickableLabel *CentralWidget::createNoteForSheet(const uint &p_noteVal)
 {
     const QString &l_imagePath = m_config->getNotes()[p_noteVal];
     QPixmap l_image(l_imagePath);
@@ -85,6 +84,24 @@ void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
     l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
     l_imageLabel->setScaledContents(true);
     l_imageLabel->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());
+    // verify if connect works  as intented
+    connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
+
+    return l_imageLabel;
+}
+
+// rename to "addNoteToSheet" ?
+void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
+{
+    ClickableLabel *l_imageLabel = createNoteForSheet(p_noteVal);
+    /*const QString &l_imagePath = m_config->getNotes()[p_noteVal];
+    QPixmap l_image(l_imagePath);
+
+    ClickableLabel *l_imageLabel = new ClickableLabel(this);
+    l_imageLabel->setPixmap(l_image);
+    l_imageLabel->setStyleSheet("QLabel { background-color : red; }");
+    l_imageLabel->setScaledContents(true);
+    l_imageLabel->resize(m_config->getSheetNoteWidth(), m_config->getSheetNoteHeight());*/
     addWidgetInLastCol(m_baseLayout, l_imageLabel, p_row);
     m_lastColumns[p_row]++;
 
@@ -92,7 +109,19 @@ void CentralWidget::drawNoteToSheet(const uint &p_noteVal, const int p_row)
     //l_imageLabel->setFixedSize(QSize(100, 600));
     //l_imageLabel->setMinimumHeight(600);
 
-    connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
+    //connect(l_imageLabel, &ClickableLabel::clicked, this, &CentralWidget::imageClicked);
+}
+
+
+void CentralWidget::replaceNoteOnSheet(const uint &p_noteVal, const int p_row, const int p_col)
+{
+    ClickableLabel *l_imageLabel = createNoteForSheet(p_noteVal);
+
+    // need to get and remove the widget
+    // this might not be generic enough
+    deleteSelectedSheetNote();
+
+    m_baseLayout->addWidget(l_imageLabel, p_row, p_col);
 }
 
 void CentralWidget::imageClicked()
@@ -127,6 +156,7 @@ void CentralWidget::imageClicked()
     emit sheetNoteSelectedChange(true);
     // afficher le truc de popup note
 }
+
 
 void CentralWidget::deleteSelectedSheetNote()
 {
@@ -292,3 +322,23 @@ void CentralWidget::initializeNoteOverlay(void)
     m_selectedNoteOverlay.setParent(nullptr);
 }
 
+
+bool CentralWidget::isSelectedNoteValid(void) const
+{
+    if (m_selectedNoteWidget == nullptr) {
+        qWarning() << "No Note selected";
+        return false;
+    }
+    if (m_selectedNoteOverlay.parent() == nullptr || m_posOfSelectedNote.isUnitialized()) {
+        qWarning() << "Extra data needed to identify selected note";
+        return false;
+    }
+
+    if (m_posOfSelectedNote.row == -1 || m_posOfSelectedNote.row > m_notes.size()
+    || m_posOfSelectedNote.column == -1 || m_posOfSelectedNote.column > m_notes[m_posOfSelectedNote.row].size()) {
+        qWarning() << "Position of selected note is incorrect";
+        return false;
+    }
+
+    return true;
+}

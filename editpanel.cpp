@@ -55,7 +55,7 @@ void EditPanel::initialize(EditPanelAccessKey)
         // It would seem more logic to me if this was QSizePolicy::Minimum ???
         l_imageLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
         m_editNotesLayout->addWidget(l_imageLabel, l_row, l_column);
-        connect(l_imageLabel, &ClickableLabel::clicked, m_centralWidget, &CentralWidget::popupNoteClicked);
+        connect(l_imageLabel, &ClickableLabel::clicked, m_centralWidget, &CentralWidget::editNoteClicked);
         l_column++;
         if (l_column == NOTE_CHOICES_MAX_COLUMNS) {
             l_column = 0;

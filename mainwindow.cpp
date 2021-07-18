@@ -233,7 +233,6 @@ void MainWindow::saveCurrentInstrument(void) const
 
 void MainWindow::loadNotesForInstrument(const std::string &p_instrumentPath)
 {
-    qDebug() << "MainWindow::loadNotesForInstrument";
     QJsonObject l_root = loadJsonObjectFromFile(p_instrumentPath);
     if (l_root.isEmpty()) {
         qWarning("Failed to load instrument json");

@@ -40,6 +40,7 @@ public:
 public Q_SLOTS:
     void imageClicked();
     void popupNoteClicked();
+    void editNoteClicked();
     void addNotePopup();
     void deleteSelectedSheetNote();
 
@@ -74,7 +75,9 @@ private:
     void changeNoteValue();
     void logCurrentNotes() const;
     void deleteCurrentNotes();
+    ClickableLabel *createNoteForSheet(const uint &p_noteVal);
     void drawNoteToSheet(const uint &p_noteVal, const int p_row);
+    void replaceNoteOnSheet(const uint &p_noteVal, const int p_row, const int p_col);
 
     void addWidgetInLastCol(QGridLayout *p_layout, QWidget *p_widget, const int p_row);
     void placeAddImage(const int p_row);
@@ -86,6 +89,7 @@ private:
     void resizeNotesDisplay();
 
     void initializeNoteOverlay(void);
+    bool isSelectedNoteValid(void) const;
 signals:
 
 };

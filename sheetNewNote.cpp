@@ -43,6 +43,17 @@ void CentralWidget::popupNoteClicked()
         placeAddImage(m_selectedRow + 1);
 }
 
+void CentralWidget::editNoteClicked()
+{
+    int l_val = sender()->property("value").value<int>();
+    if (isSelectedNoteValid()) {
+        m_notes[m_posOfSelectedNote.row][m_posOfSelectedNote.column] = l_val;
+        replaceNoteOnSheet(l_val, m_posOfSelectedNote.row, m_posOfSelectedNote.column);
+    }
+
+    // If we allow the "addImage" to be selected we will need to recreate one here
+}
+
 void CentralWidget::addNotePopup()
 {
     if (sender()) {
